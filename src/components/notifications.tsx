@@ -53,7 +53,6 @@ export default function Notifications() {
     notificationType: string,
     meta?: Metadata,
   ) => {
-    console.log(notificationType);
     switch (notificationType) {
       case "new-message":
         return () => {
@@ -150,7 +149,9 @@ export default function Notifications() {
       </DropdownTrigger>
       <DropdownMenu
         aria-label="Уведомления"
-        className={"w-[500px]"}
+        className={
+          "w-[500px] max-h-[500px] overflow-y-auto mb-5 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:bg-gray-300 dark:[&::-webkit-scrollbar-track]:bg-neutral-700 dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500 [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-thumb]:rounded-full"
+        }
         disabledKeys={["empty"]}
         variant="faded"
       >
@@ -165,6 +166,11 @@ export default function Notifications() {
                     description: "line-clamp-2 text-pretty whitespace-pre-wrap",
                   }}
                   description={n.body}
+                  endContent={
+                    <p className="text-xs text-nowrap">
+                      {moment(n.timestamp).fromNow()}
+                    </p>
+                  }
                   startContent={convertNotificationTypeToTag(n.type)}
                   textValue={n.title}
                   onPress={mapNotificationBehavior(n.type, n.metadata)}

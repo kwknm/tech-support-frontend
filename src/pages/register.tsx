@@ -25,13 +25,12 @@ export default function RegisterPage() {
 
       localStorage.setItem("token", response.data.access_token);
       await checkAuth();
-      navigate("/");
-
       addToast({
         title: "Успешная регистрация!",
         description: "Теперь вы можете создать заявку",
         color: "success",
       });
+      navigate("/");
     } catch (err) {
       console.error(err);
     }

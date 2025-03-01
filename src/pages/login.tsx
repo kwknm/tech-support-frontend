@@ -27,8 +27,6 @@ export default function LoginPage() {
 
       localStorage.setItem("token", accessToken);
       await checkAuth();
-      navigate("/");
-
       addToast({
         title: "Успешный вход!",
         color: "success",
@@ -39,6 +37,7 @@ export default function LoginPage() {
         description: err.response.data?.message,
         color: "danger",
       });
+      navigate("/");
     }
   }
 

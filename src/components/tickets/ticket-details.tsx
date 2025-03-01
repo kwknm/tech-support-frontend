@@ -21,6 +21,8 @@ type Props = {
   createdAt: Date;
   issueType: { name: string };
   description: string;
+  closedAt?: Date;
+  isClosed: boolean;
 };
 
 export default function TicketDetails({
@@ -29,6 +31,8 @@ export default function TicketDetails({
   createdAt,
   issueType,
   description,
+  closedAt,
+  isClosed,
 }: Props) {
   const { isDark } = useTheme();
 
@@ -72,15 +76,23 @@ export default function TicketDetails({
           </TableRow>
           <TableRow key="3">
             <TableCell className="text-gray-500 dark:text-gray-400 font-semibold">
+              Тип проблемы
+            </TableCell>
+            <TableCell>{issueType.name}</TableCell>
+          </TableRow>
+          <TableRow key="4">
+            <TableCell className="text-gray-500 dark:text-gray-400 font-semibold">
               Дата создания
             </TableCell>
             <TableCell>{moment(createdAt).format("LLL")}</TableCell>
           </TableRow>
-          <TableRow key="4">
+          <TableRow key="5">
             <TableCell className="text-gray-500 dark:text-gray-400 font-semibold">
-              Тип проблемы
+              Дата закрытия
             </TableCell>
-            <TableCell>{issueType.name}</TableCell>
+            <TableCell>
+              {isClosed ? moment(closedAt).format("LLL") : "Нет"}
+            </TableCell>
           </TableRow>
         </TableBody>
       </Table>

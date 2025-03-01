@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { Chip } from "@heroui/chip";
-import { Button, Tooltip } from "@heroui/react";
+import { Snippet, Tooltip } from "@heroui/react";
 
 import { siteConfig } from "@/config/site.ts";
 import { DocumentIcon } from "@/components/icons.tsx";
@@ -12,6 +12,16 @@ type Props = {
   bytesLength: number;
 };
 
+function formatBytes(bytes: number, decimals = 2) {
+  if (bytes === 0) return "0 Bytes";
+
+  const k = 1024; // 1 KB = 1024 Bytes
+  const sizes = ["B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+
+  return `${parseFloat((bytes / Math.pow(k, i)).toFixed(decimals))} ${sizes[i]}`;
+}
+
 export default function AttachmentCard({
   id,
   fileName,
@@ -20,25 +30,32 @@ export default function AttachmentCard({
 }: Props) {
   return (
     <Tooltip closeDelay={0} content={fileName}>
-      <Button
+      <Snippet
+        disableCopy
         as={Link}
-        className="p-2 h-full max-w-fit"
+        className="max-w-[200px]"
         color="secondary"
-        size="lg"
+        copyIcon={<DocumentIcon size={32} />}
+        symbol={
+          <p className="text-left mb-1 text-wrap line-clamp-1 text-gray-800 font-semibold  dark:text-white">
+            {fileName}
+          </p>
+        }
         to={`${siteConfig.api_url}/api/attachments/${id}`}
         variant="flat"
       >
-        <DocumentIcon size={32} />
-        <div className="max-w-[150px]">
-          <p className="text-sm text-wrap line-clamp-1 text-gray-800 font-bold  dark:text-white">
-            {fileName}
-          </p>
-          <Chip color="default" radius="sm" size="sm" variant="flat">
-            {fileExtension?.slice(1).toUpperCase()}{" "}
-            {(bytesLength / 1024).toFixed(3)} KB
-          </Chip>
-        </div>
-      </Button>
+        <Chip
+          className="justify-start flex"
+          color="default"
+          radius="sm"
+          size="sm"
+          variant="flat"
+        >
+          <div className="line-clamp-1 max-w-[125px]">
+            {formatBytes(bytesLength)} {fileExtension?.slice(1).toUpperCase()}
+          </div>
+        </Chip>
+      </Snippet>
     </Tooltip>
   );
 }

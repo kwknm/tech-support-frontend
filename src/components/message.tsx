@@ -1,5 +1,6 @@
 import moment from "moment/min/moment-with-locales";
 import { Tooltip } from "@heroui/react";
+import Linkify from "react-linkify";
 
 import { Attachment } from "@/types";
 import AttachmentCard from "@/components/attachment-card.tsx";
@@ -42,7 +43,9 @@ export const Message = ({
         <div className="grow text-end">
           <div className="inline-flex flex-col gap-2 items-end">
             <div className="inline-block leading-none bg-blue-500 dark:bg-blue-600 rounded-xl px-3 pt-2 pb-1 shadow-lg">
-              <p className="text-md text-white text-start">{content}</p>
+              <p className="text-md text-white text-start">
+                <Linkify>{content}</Linkify>
+              </p>
               <Tooltip closeDelay={0} content={formattedFull}>
                 <span className="text-xs text-gray-300">{formatted}</span>
               </Tooltip>
@@ -61,21 +64,23 @@ export const Message = ({
     );
 
   return (
-    <li className="flex gap-x-2 sm:gap-x-4 me-11 max-w-[90%]">
-      <div>
-        <h2 className="font-medium text-sm mb-1 text-gray-700 dark:text-gray-300">
-          {fullName}
-        </h2>
-        <div className="bg-white leading-none border max-w-full border-gray-200 rounded-2xl px-3 pt-2 pb-1 space-y-3 dark:bg-neutral-900 dark:border-neutral-700">
-          <div className="space-y-1.5">
-            <p className="text-sm text-gray-800 dark:text-white">
-              {content}
-            </p>
-            <Tooltip closeDelay={0} content={formattedFull}>
-              <span className="text-xs text-gray-600 dark:text-gray-300">
-                {formatted}
-              </span>
-            </Tooltip>
+    <>
+      <li className="gap-x-2 sm:gap-x-4 me-11 max-w-[90%] flex flex-col">
+        <div>
+          <h2 className="max-w-[300px] font-medium text-sm mb-1 text-gray-700 dark:text-gray-300">
+            {fullName}
+          </h2>
+          <div className="bg-white leading-none border max-w-fit border-gray-200 rounded-2xl px-3 pt-2 pb-1 space-y-3 dark:bg-neutral-900 dark:border-neutral-700">
+            <div className="space-y-1.5">
+              <p className="text-sm text-gray-800 dark:text-white">
+                <Linkify>{content}</Linkify>
+              </p>
+              <Tooltip closeDelay={0} content={formattedFull}>
+                <span className="text-xs text-gray-600 dark:text-gray-300">
+                  {formatted}
+                </span>
+              </Tooltip>
+            </div>
           </div>
         </div>
 
@@ -101,17 +106,17 @@ export const Message = ({
               <span className="text-green-500 mb-1.5">Поддержка</span>
             </div>
           )}
-
-          {attachment && (
-            <AttachmentCard
-              bytesLength={attachment.bytesLength}
-              fileExtension={attachment.fileExtension}
-              fileName={attachment.fileName}
-              id={attachment.id}
-            />
-          )}
         </span>
-      </div>
-    </li>
+
+        {attachment && (
+          <AttachmentCard
+            bytesLength={attachment.bytesLength}
+            fileExtension={attachment.fileExtension}
+            fileName={attachment.fileName}
+            id={attachment.id}
+          />
+        )}
+      </li>
+    </>
   );
 };

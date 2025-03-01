@@ -43,7 +43,6 @@ const ChatPage = () => {
 
   useEffect(() => {
     Axios.get(`/api/tickets/${id}/messages`).then((response) => {
-      setMessagesIsLoading(false);
       setMessages(
         response.data.map((x: any) => ({
           ...x,
@@ -51,6 +50,7 @@ const ChatPage = () => {
           lastName: x.user.lastName,
         })),
       );
+      setMessagesIsLoading(false);
     });
 
     const newConnection = new HubConnectionBuilder()
@@ -78,7 +78,15 @@ const ChatPage = () => {
 
       connection.on(
         "ReceiveMessage",
-        (firstName, lastName, content, isSupport, timestamp, userId) => {
+        (
+          firstName,
+          lastName,
+          content,
+          isSupport,
+          timestamp,
+          userId,
+          attachment,
+        ) => {
           const msg = {
             firstName,
             lastName,
@@ -86,6 +94,7 @@ const ChatPage = () => {
             isSupport,
             timestamp,
             userId,
+            attachment,
           };
 
           scrollToChatBottom();
@@ -122,15 +131,16 @@ const ChatPage = () => {
 
     const form = Object.fromEntries(new FormData(e.currentTarget));
 
-    if (!form.content) {
+    if (!(form.content as string).trim()) {
       setErrorMessage("Сообщение не может быть пустым");
+      e.target.reset();
 
       return;
     }
 
     let attachmentId = null;
 
-    if (form.attachment) {
+    if ((form.attachment as File).size != 0) {
       try {
         const response = await Axios.post("/api/attachments", form, {
           headers: {
@@ -165,7 +175,7 @@ const ChatPage = () => {
       />
     );
 
-  if (isLoading)
+  if (isLoading || messagesIsLoading)
     return (
       <div className="flex justify-center">
         <Spinner />
@@ -208,45 +218,38 @@ const ChatPage = () => {
               variant="flat"
             />
           )}
-          {!messages?.length && !user?.isSupport && !data?.isClosed && (
+          {!messages?.length && !data?.isClosed && (
             <Alert
               isClosable
+              className="mb-1"
               color="primary"
-              title="Используйте этот чат для связи с поддержкой"
+              title={`Используйте этот чат для связи с ${user?.isSupport ? "пользователем" : "сотрудником поддержки"}`}
               variant="flat"
             />
           )}
-          {messagesIsLoading ? (
-            <Spinner
-              className="h-[500px]"
-              label="Загружаем сообщения..."
-              size="lg"
-            />
-          ) : (
-            <ul
-              className="space-y-3 h-[500px] overflow-y-scroll w-[600px] mb-5 [&::-webkit-scrollbar]:w-2
+          <ul
+            className="space-y-3 h-[500px] overflow-y-auto w-[600px] mb-5 [&::-webkit-scrollbar]:w-2
                       [&::-webkit-scrollbar-track]:bg-gray-100
                       [&::-webkit-scrollbar-thumb]:bg-gray-300
                       dark:[&::-webkit-scrollbar-track]:bg-neutral-700
                       dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500
                        [&::-webkit-scrollbar-track]:rounded-full
                        [&::-webkit-scrollbar-thumb]:rounded-full pr-2"
-            >
-              {messages?.map((m, idx) => (
-                <Message
-                  key={m.content + idx}
-                  attachment={m.attachment}
-                  content={m.content}
-                  firstName={m.firstName}
-                  isSupport={m.isSupport}
-                  isUsersMessage={m.userId == user?.id}
-                  lastName={m.lastName}
-                  timestamp={m.timestamp}
-                />
-              ))}
-              <div id="scroll" />
-            </ul>
-          )}
+          >
+            {messages?.map((m, idx) => (
+              <Message
+                key={m.content + idx}
+                attachment={m.attachment}
+                content={m.content}
+                firstName={m.firstName}
+                isSupport={m.isSupport}
+                isUsersMessage={m.userId == user?.id}
+                lastName={m.lastName}
+                timestamp={m.timestamp}
+              />
+            ))}
+            <div id="scroll" />
+          </ul>
         </div>
         <Form className="flex flex-row gap-1" onSubmit={sendMessage}>
           <Tooltip content="Добавить вложение">

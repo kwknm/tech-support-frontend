@@ -91,7 +91,7 @@ export default function TicketsUserView() {
         : "Нет",
       actions: (
         <div className="flex gap-1 justify-left items-center">
-          <Tooltip content="Перейти к заявке">
+          <Tooltip closeDelay={0} content="Перейти к заявке">
             <Button
               isIconOnly
               as={Link}

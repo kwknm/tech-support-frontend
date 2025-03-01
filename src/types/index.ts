@@ -24,6 +24,7 @@ export type Ticket = {
   issuerId: string;
   issuer: { id: string; firstName: string; lastName: string; email: string };
   createdAt: Date;
+  closedAt?: Date;
   isClosed: boolean;
   chatId: string;
   attachment: Attachment;

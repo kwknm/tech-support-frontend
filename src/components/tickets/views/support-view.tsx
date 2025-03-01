@@ -21,8 +21,8 @@ import { Chip } from "@heroui/chip";
 import { title } from "@/components/primitives.ts";
 import { useAuthStore } from "@/hooks/use-auth-store.ts";
 import {
+  CheckPlusIcon,
   DocumentCheckIcon,
-  DocumentPlusIcon,
   DocumentShieldIcon,
   ExternalIcon,
 } from "@/components/icons.tsx";
@@ -85,11 +85,7 @@ export default function TicketsSupportView() {
     uri.searchParams.append("statusId", statusFilter);
   myAssignment && uri.searchParams.append("supportId", user!.id);
 
-  const { data, isLoading, mutate } = useSWR(uri.toString(), null, {
-    revalidateOnReconnect: false,
-    revalidateOnFocus: false,
-    revalidateIfStale: false,
-  });
+  const { data, isLoading, mutate } = useSWR(uri.toString());
 
   const assignTicket = async (ticketId: number) => {
     try {
@@ -132,7 +128,7 @@ export default function TicketsSupportView() {
         ),
         actions: (
           <div className="flex gap-1 justify-left items-center">
-            <Tooltip content="Перейти к заявке">
+            <Tooltip closeDelay={0} content="Перейти к заявке">
               <Button
                 isIconOnly
                 as={Link}
@@ -151,19 +147,22 @@ export default function TicketsSupportView() {
                     await assignTicket(ticket.id);
                   }}
                 >
-                  <DocumentPlusIcon />
+                  <CheckPlusIcon />
                 </Button>
               </Tooltip>
             )}
             {ticket.supportId != user?.id && ticket.supportId != null && (
-              <Tooltip content="Заявка уже рассматривается другим сотрудником">
+              <Tooltip
+                closeDelay={0}
+                content="Заявка уже рассматривается другим сотрудником"
+              >
                 <Button disableRipple isIconOnly variant="bordered">
                   <DocumentShieldIcon className="text-warning" />
                 </Button>
               </Tooltip>
             )}
             {ticket.supportId == user?.id && (
-              <Tooltip content="Вы рассматриваете эту заявку">
+              <Tooltip closeDelay={0} content="Вы рассматриваете эту заявку">
                 <Button disableRipple isIconOnly variant="bordered">
                   <DocumentCheckIcon className="text-success" />
                 </Button>
@@ -211,7 +210,7 @@ export default function TicketsSupportView() {
             ))}
           </Select>
           <Checkbox onValueChange={(value) => setMyAssignment(value)}>
-            На вашем рассмотрении
+            На моем рассмотрении
           </Checkbox>
         </div>
         <div>

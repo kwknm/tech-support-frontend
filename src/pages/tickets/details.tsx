@@ -6,7 +6,12 @@ import { Alert } from "@heroui/alert";
 import { addToast } from "@heroui/toast";
 
 import { Ticket } from "@/types";
-import { CheckIcon, CloseIcon, ExternalIcon } from "@/components/icons.tsx";
+import {
+  CheckIcon,
+  CheckPlusIcon,
+  CloseIcon,
+  ExternalIcon,
+} from "@/components/icons.tsx";
 import TicketDetails from "@/components/tickets/ticket-details.tsx";
 import TicketHeader from "@/components/tickets/ticket-header.tsx";
 import { Axios } from "@/api/api-provider.ts";
@@ -73,6 +78,24 @@ export default function TicketDetailsPage() {
       </>
     );
 
+  const assignTicket = async (ticketId: number) => {
+    try {
+      await Axios.post(`/api/tickets/${ticketId}/assign`);
+      await mutate();
+      addToast({
+        title: "Успешно",
+        description: "Вы принялись за заявку",
+        color: "success",
+      });
+    } catch (e: any) {
+      addToast({
+        title: e.response?.message || "Что-то пошло не так...",
+        color: "danger",
+      });
+      console.error(e);
+    }
+  };
+
   return (
     <>
       <TicketHeader
@@ -83,63 +106,79 @@ export default function TicketDetailsPage() {
       />
       <div className="my-5">
         <div className="flex justify-between">
-          <Tooltip
-            closeDelay={0}
-            content="Заявка еще не принята на рассмотрение"
-            isDisabled={!!data?.supportId}
-          >
-            <span>
-              <Button
-                as={Link}
-                isDisabled={
-                  (user?.id != data?.issuerId && user?.id != data?.supportId) ||
-                  !data?.supportId
-                }
-                startContent={<ExternalIcon />}
-                to={`/tickets/${id}/chat`}
-                variant="shadow"
-              >
-                К чату
-              </Button>
-            </span>
-          </Tooltip>
-
-          {isSupport && (
-            <Tooltip
-              closeDelay={0}
-              content={
-                data?.isClosed
-                  ? "Заявка уже закрыта"
-                  : "Вы не рассматриваете эту заявку"
-              }
-              isDisabled={!data?.isClosed && user?.id == data?.supportId}
+          {!data?.supportId && isSupport ? (
+            <Button
+              color="success"
+              startContent={<CheckPlusIcon className="text-success" />}
+              variant="flat"
+              onPress={async () => await assignTicket(data!.id)}
             >
-              <ButtonGroup>
-                <Button
-                  color={"success"}
-                  endContent={<CheckIcon className={"text-success"} />}
-                  isDisabled={data?.isClosed || user?.id != data?.supportId}
-                  variant="faded"
-                  onPress={closeTicket}
+              Приняться за заявку
+            </Button>
+          ) : (
+            <>
+              <Tooltip
+                closeDelay={0}
+                content="Заявка еще не принята на рассмотрение"
+                isDisabled={!!data?.supportId}
+              >
+                <span>
+                  <Button
+                    as={Link}
+                    isDisabled={
+                      (user?.id != data?.issuerId &&
+                        user?.id != data?.supportId) ||
+                      !data?.supportId
+                    }
+                    startContent={<ExternalIcon />}
+                    to={`/tickets/${id}/chat`}
+                    variant="shadow"
+                  >
+                    К чату
+                  </Button>
+                </span>
+              </Tooltip>
+
+              {isSupport && (
+                <Tooltip
+                  closeDelay={0}
+                  content={
+                    data?.isClosed
+                      ? "Заявка уже закрыта"
+                      : "Вы не рассматриваете эту заявку"
+                  }
+                  isDisabled={!data?.isClosed && user?.id == data?.supportId}
                 >
-                  Закрыть заявку
-                </Button>
-                <Button
-                  color={"danger"}
-                  endContent={<CloseIcon className={"text-danger"} />}
-                  isDisabled={data?.isClosed || user?.id != data?.supportId}
-                  variant="faded"
-                  onPress={rejectTicket}
-                >
-                  Отклонить заявку
-                </Button>
-              </ButtonGroup>
-            </Tooltip>
+                  <ButtonGroup>
+                    <Button
+                      color={"success"}
+                      endContent={<CheckIcon className={"text-success"} />}
+                      isDisabled={data?.isClosed || user?.id != data?.supportId}
+                      variant="faded"
+                      onPress={closeTicket}
+                    >
+                      Закрыть заявку
+                    </Button>
+                    <Button
+                      color={"danger"}
+                      endContent={<CloseIcon className={"text-danger"} />}
+                      isDisabled={data?.isClosed || user?.id != data?.supportId}
+                      variant="faded"
+                      onPress={rejectTicket}
+                    >
+                      Отклонить заявку
+                    </Button>
+                  </ButtonGroup>
+                </Tooltip>
+              )}
+            </>
           )}
         </div>
         <TicketDetails
+          closedAt={data!.closedAt}
           createdAt={data!.createdAt}
           description={data!.description}
+          isClosed={data!.isClosed}
           issueType={data!.issueType}
           issuer={data!.issuer}
           support={data!.support!}
