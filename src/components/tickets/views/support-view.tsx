@@ -10,6 +10,7 @@ import {
   TableCell,
   TableRow,
   Tooltip,
+  useDisclosure,
   User,
 } from "@heroui/react";
 import useSWR from "swr";
@@ -30,6 +31,7 @@ import { Ticket } from "@/types";
 import { Axios } from "@/api/api-provider.ts";
 import { convertStatusToTag } from "@/pages/tickets";
 import { siteConfig } from "@/config/site.ts";
+import IssuesModal from "@/components/issues-modal.tsx";
 
 const columns = [
   {
@@ -78,6 +80,7 @@ export default function TicketsSupportView() {
   const { user } = useAuthStore();
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [myAssignment, setMyAssignment] = useState<boolean>(false);
+  const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const uri = new URL("/api/tickets", siteConfig.api_url);
 
   statusFilter &&
@@ -185,6 +188,7 @@ export default function TicketsSupportView() {
 
   return (
     <>
+      <IssuesModal isOpen={isOpen} onOpenChange={onOpenChange} />
       <section className="flex flex-col items-center justify-center gap-4 pt-8 md:pt-10">
         <div className="max-w-lg text-center justify-center flex flex-col mb-10">
           <h1 className={title()}>
@@ -193,25 +197,30 @@ export default function TicketsSupportView() {
         </div>
       </section>
       <main>
-        <div className="flex flex-row gap-5">
-          <Select
-            disallowEmptySelection
-            className="max-w-[200px]"
-            defaultSelectedKeys={["all"]}
-            label="Статус"
-            size="sm"
-            variant="bordered"
-            onSelectionChange={(keys) => {
-              setStatusFilter(keys.currentKey!);
-            }}
-          >
-            {statusDict.map((x) => (
-              <SelectItem key={x.key}>{x.label}</SelectItem>
-            ))}
-          </Select>
-          <Checkbox onValueChange={(value) => setMyAssignment(value)}>
-            На моем рассмотрении
-          </Checkbox>
+        <div className="flex justify-between items-center">
+          <div className="flex flex-row gap-5 w-full">
+            <Select
+              disallowEmptySelection
+              className="max-w-[200px]"
+              defaultSelectedKeys={["all"]}
+              label="Статус"
+              size="sm"
+              variant="bordered"
+              onSelectionChange={(keys) => {
+                setStatusFilter(keys.currentKey!);
+              }}
+            >
+              {statusDict.map((x) => (
+                <SelectItem key={x.key}>{x.label}</SelectItem>
+              ))}
+            </Select>
+            <Checkbox onValueChange={(value) => setMyAssignment(value)}>
+              На моем рассмотрении
+            </Checkbox>
+          </div>
+          <Button className="flex-shrink-0" variant="bordered" onPress={onOpen}>
+            Управление проблемами
+          </Button>
         </div>
         <div>
           <Chip className="my-3" radius="sm">
@@ -219,7 +228,6 @@ export default function TicketsSupportView() {
           </Chip>
         </div>
         <Table
-          isVirtualized
           aria-label={"заявки"}
           bottomContent={
             <div className="flex w-full justify-center">

@@ -204,7 +204,7 @@ const ChatPage = () => {
           Обсуждение
         </h2>
         <Divider className="mb-2" />
-        <div className="flex flex-col items-center">
+        <div className="flex flex-col items-center h-[calc(95vh/2)]">
           {data?.isClosed && (
             <Alert
               className="my-3"

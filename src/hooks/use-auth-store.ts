@@ -32,11 +32,12 @@ export const useAuthStore: UseBoundStore<Mutate<StoreApi<IAuthStore>, []>> =
           set({ user: response.data });
           set({ isLoggedIn: true });
           set({ isSupport: response.data.isSupport });
-        } catch {
+        } catch (err: any) {
           set({ token: null, user: null });
+          throw err;
         }
       } else {
         set({ isLoggedIn: false });
       }
-    }
+    },
   }));
