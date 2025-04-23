@@ -158,33 +158,25 @@ export const HeartFilledIcon = ({
   </svg>
 );
 
-export const SearchIcon = (props: IconSvgProps) => (
-  <svg
-    aria-hidden="true"
-    fill="none"
-    focusable="false"
-    height="16px"
-    role="presentation"
-    viewBox="0 0 24 24"
-    width="16px"
-    {...props}
-  >
-    <path
-      d="M11.5 21C16.7467 21 21 16.7467 21 11.5C21 6.25329 16.7467 2 11.5 2C6.25329 2 2 6.25329 2 11.5C2 16.7467 6.25329 21 11.5 21Z"
-      stroke="currentColor"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth="4"
-    />
-    <path
-      d="M22 22L20 20"
-      stroke="currentColor"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth="4"
-    />
-  </svg>
-);
+export function SearchIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg
+      height="20px"
+      viewBox="0 0 12 12"
+      width="20px"
+      xmlns="http://www.w3.org/2000/svg"
+      {...props}
+    >
+      <circle cx="4.5" cy="4.5" fill="none" r="4" stroke="currentColor" />
+      <path
+        d="M11 11L7.5 7.5"
+        fill="currentColor"
+        stroke="currentColor"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
 
 export const ExternalIcon = () => {
   return (
@@ -553,6 +545,23 @@ export function CheckPlusIcon(props: SVGProps<SVGSVGElement>) {
         strokeLinecap="round"
         strokeLinejoin="round"
         strokeWidth="2"
+      />
+    </svg>
+  );
+}
+
+export function BaselineCheck(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg
+      height="1em"
+      viewBox="0 0 24 24"
+      width="1em"
+      xmlns="http://www.w3.org/2000/svg"
+      {...props}
+    >
+      <path
+        d="M9 16.17L4.83 12l-1.42 1.41L9 19L21 7l-1.41-1.41z"
+        fill="currentColor"
       />
     </svg>
   );

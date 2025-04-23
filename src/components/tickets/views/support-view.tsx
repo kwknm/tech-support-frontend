@@ -135,6 +135,7 @@ export default function TicketsSupportView() {
               <Button
                 isIconOnly
                 as={Link}
+                radius="full"
                 to={`/tickets/${ticket.id}`}
                 variant="bordered"
               >
@@ -145,6 +146,7 @@ export default function TicketsSupportView() {
               <Tooltip content="Приняться за заявку">
                 <Button
                   isIconOnly
+                  radius="full"
                   variant="bordered"
                   onPress={async () => {
                     await assignTicket(ticket.id);
@@ -159,14 +161,24 @@ export default function TicketsSupportView() {
                 closeDelay={0}
                 content="Заявка уже рассматривается другим сотрудником"
               >
-                <Button disableRipple isIconOnly variant="bordered">
+                <Button
+                  disableRipple
+                  isIconOnly
+                  radius="full"
+                  variant="bordered"
+                >
                   <DocumentShieldIcon className="text-warning" />
                 </Button>
               </Tooltip>
             )}
             {ticket.supportId == user?.id && (
               <Tooltip closeDelay={0} content="Вы рассматриваете эту заявку">
-                <Button disableRipple isIconOnly variant="bordered">
+                <Button
+                  disableRipple
+                  isIconOnly
+                  radius="full"
+                  variant="bordered"
+                >
                   <DocumentCheckIcon className="text-success" />
                 </Button>
               </Tooltip>

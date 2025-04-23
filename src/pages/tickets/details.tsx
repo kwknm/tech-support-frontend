@@ -11,6 +11,7 @@ import {
   CheckPlusIcon,
   CloseIcon,
   ExternalIcon,
+  PaperClipIcon,
 } from "@/components/icons.tsx";
 import TicketDetails from "@/components/tickets/ticket-details.tsx";
 import TicketHeader from "@/components/tickets/ticket-header.tsx";
@@ -183,7 +184,10 @@ export default function TicketDetailsPage() {
           issuer={data!.issuer}
           support={data!.support!}
         />
-        <h2 className="font-semibold my-3 text-xl">Приложения</h2>
+        <span className="flex flex-row items-center">
+          <PaperClipIcon />
+          <h2 className="my-3 text-xl">Приложения</h2>
+        </span>
         {data?.attachment ? (
           <AttachmentCard
             bytesLength={data.attachment.bytesLength}
@@ -192,7 +196,7 @@ export default function TicketDetailsPage() {
             id={data.attachment.id}
           />
         ) : (
-          <p className={"font-light italic"}>Приложений нет.</p>
+          <p className="font-light italic">Приложений нет.</p>
         )}
       </div>
     </>

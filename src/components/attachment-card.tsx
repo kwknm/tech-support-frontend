@@ -1,9 +1,10 @@
 import { Link } from "react-router-dom";
 import { Chip } from "@heroui/chip";
 import { Snippet, Tooltip } from "@heroui/react";
+import { FileIcon } from "lucide-react";
 
 import { siteConfig } from "@/config/site.ts";
-import { DocumentIcon } from "@/components/icons.tsx";
+import { formatBytes } from "@/lib/utils.tsx";
 
 type Props = {
   id: string;
@@ -11,16 +12,6 @@ type Props = {
   fileExtension: string;
   bytesLength: number;
 };
-
-function formatBytes(bytes: number, decimals = 2) {
-  if (bytes === 0) return "0 Bytes";
-
-  const k = 1024; // 1 KB = 1024 Bytes
-  const sizes = ["B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"];
-  const i = Math.floor(Math.log(bytes) / Math.log(k));
-
-  return `${parseFloat((bytes / Math.pow(k, i)).toFixed(decimals))} ${sizes[i]}`;
-}
 
 export default function AttachmentCard({
   id,
@@ -33,11 +24,11 @@ export default function AttachmentCard({
       <Snippet
         disableCopy
         as={Link}
-        className="max-w-[200px]"
+        className="max-w-[250px]"
         color="secondary"
-        copyIcon={<DocumentIcon size={32} />}
+        copyIcon={<FileIcon size={32} />}
         symbol={
-          <p className="text-left mb-1 text-wrap line-clamp-1 text-gray-800 font-semibold  dark:text-white">
+          <p className="max-w-[175px] text-left mb-1 text-wrap line-clamp-1 text-gray-800 font-semibold  dark:text-white">
             {fileName}
           </p>
         }
@@ -46,13 +37,13 @@ export default function AttachmentCard({
       >
         <Chip
           className="justify-start flex"
-          color="default"
+          color="primary"
           radius="sm"
           size="sm"
           variant="flat"
         >
-          <div className="line-clamp-1 max-w-[125px]">
-            {formatBytes(bytesLength)} {fileExtension?.slice(1).toUpperCase()}
+          <div className="line-clamp-1 max-w-[150px] font-semibold">
+            {formatBytes(bytesLength)} · {fileExtension?.slice(1).toUpperCase()}
           </div>
         </Chip>
       </Snippet>

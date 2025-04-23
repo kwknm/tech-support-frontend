@@ -1,45 +1,43 @@
-import { Divider, Spinner, Tooltip, Textarea, Button } from "@heroui/react";
+import {
+  Button,
+  Divider,
+  Form,
+  Spinner,
+  Textarea,
+  Tooltip,
+} from "@heroui/react";
 import { HubConnection, HubConnectionBuilder } from "@microsoft/signalr";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router";
 import useSWR from "swr";
 import { Link } from "react-router-dom";
-import { Form } from "@heroui/react";
 import { Alert } from "@heroui/alert";
+import { AxiosError } from "axios";
+import { addToast } from "@heroui/toast";
 
 import { ExternalIcon, PaperClipIcon, PlaneIcon } from "@/components/icons.tsx";
 import { Message } from "@/components/message.tsx";
 import TicketHeader from "@/components/tickets/ticket-header.tsx";
-import { Attachment, Ticket } from "@/types";
+import { Ticket, MessageType } from "@/types";
 import { Axios } from "@/api/api-provider.ts";
 import { useAuthStore } from "@/hooks/use-auth-store.ts";
 import { siteConfig } from "@/config/site.ts";
 
-type Message = {
-  firstName: string;
-  lastName: string;
-  content: string;
-  isSupport: boolean;
-  timestamp: Date;
-  userId: string;
-  attachment?: Attachment;
-};
+const scrollToChatBottom = () =>
+  document.getElementById("scroll")?.scrollIntoView({
+    behavior: "smooth",
+  });
 
 const ChatPage = () => {
   const { id } = useParams();
   const { user } = useAuthStore();
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [messages, setMessages] = useState<MessageType[]>([]);
   const [messagesIsLoading, setMessagesIsLoading] = useState<boolean>(true);
   const [connection, setConnection] = useState<HubConnection | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [conStatusMessage, setConStatusMessage] = useState<string | null>(null);
+  const [isSendingMessage, setIsSendingMessage] = useState(false);
 
   const { data, isLoading, error } = useSWR<Ticket>(`/api/tickets/${id}`);
-
-  const scrollToChatBottom = () =>
-    document.getElementById("scroll")?.scrollIntoView({
-      behavior: "smooth",
-    });
 
   useEffect(() => {
     Axios.get(`/api/tickets/${id}/messages`).then((response) => {
@@ -66,67 +64,37 @@ const ChatPage = () => {
   }, []);
 
   useEffect(() => {
-    if (connection) {
-      connection.start().then(() => {
-        console.log("SignalR Chat Connected");
-        if (data?.chatId) {
+    if (connection && data?.chatId) {
+      connection
+        .start()
+        .then(() => {
+          console.log("SignalR Chat Connected");
           connection.send("JoinChat", data.chatId).then(() => {
             console.log("Joined chat");
           });
-        }
-      });
+        })
+        .catch((error) => {
+          console.error("Ошибка при подключении к SignalR:", error);
+        });
 
-      connection.on(
-        "ReceiveMessage",
-        (
-          firstName,
-          lastName,
-          content,
-          isSupport,
-          timestamp,
-          userId,
-          attachment,
-        ) => {
-          const msg = {
-            firstName,
-            lastName,
-            content,
-            isSupport,
-            timestamp,
-            userId,
-            attachment,
-          };
-
-          scrollToChatBottom();
-          setMessages((prevMessages) => [...prevMessages, msg]);
-        },
-      );
-
-      connection.onreconnecting((_) => {
-        setConStatusMessage("Переподключение...");
-      });
-
-      connection.onreconnected((_) => {
-        setConStatusMessage(null);
-      });
-
-      connection.onclose((_) => {
-        console.log("Соединение закрыто. Попытка переподключения...");
+      connection.on("ReceiveMessage", (response: MessageType) => {
+        setMessages((prevMessages) => [...prevMessages, response]);
+        scrollToChatBottom();
       });
 
       connection.on("ReceiveSystemMessage", (content) => {
         console.log(content);
-        scrollToChatBottom();
       });
 
       return () => {
         connection.off("ReceiveMessage");
       };
     }
-  }, [connection]);
+  }, [connection, data]);
 
   const sendMessage = async (e: any) => {
     e.preventDefault();
+    setIsSendingMessage(true);
     setErrorMessage(null);
 
     const form = Object.fromEntries(new FormData(e.currentTarget));
@@ -149,8 +117,18 @@ const ChatPage = () => {
         });
 
         attachmentId = response.data?.attachmentId ?? null;
-      } catch (e) {
-        console.error(e);
+      } catch (err) {
+        if (err instanceof AxiosError) {
+          addToast({
+            title: "Произошла ошибка",
+            color: "danger",
+            description: err.response?.data.message,
+          });
+        }
+
+        setIsSendingMessage(false);
+
+        return;
       }
     }
 
@@ -162,6 +140,7 @@ const ChatPage = () => {
         form.content,
         attachmentId,
       );
+      setIsSendingMessage(false);
     } else {
       console.error("connection is not presented");
     }
@@ -228,7 +207,7 @@ const ChatPage = () => {
             />
           )}
           <ul
-            className="space-y-3 h-[500px] overflow-y-auto w-[600px] mb-5 [&::-webkit-scrollbar]:w-2
+            className="space-y-2 h-[500px] overflow-y-auto w-[600px] mb-5 [&::-webkit-scrollbar]:w-2
                       [&::-webkit-scrollbar-track]:bg-gray-100
                       [&::-webkit-scrollbar-thumb]:bg-gray-300
                       dark:[&::-webkit-scrollbar-track]:bg-neutral-700
@@ -273,7 +252,6 @@ const ChatPage = () => {
           <Textarea
             isRequired
             className="w-[450px]"
-            description={conStatusMessage}
             errorMessage={errorMessage}
             isDisabled={data?.isClosed}
             isInvalid={!!errorMessage}
@@ -288,11 +266,14 @@ const ChatPage = () => {
               isIconOnly
               color="default"
               isDisabled={data?.isClosed}
-              isLoading={messagesIsLoading}
               type="submit"
               variant="bordered"
             >
-              <PlaneIcon />
+              {isSendingMessage ? (
+                <Spinner size="sm" variant="gradient" />
+              ) : (
+                <PlaneIcon />
+              )}
             </Button>
           </Tooltip>
         </Form>

@@ -39,7 +39,9 @@ export default function IndexPage() {
           <Snippet hideCopyButton hideSymbol variant="bordered">
             <span>
               Часто задаваемые вопросы вы можете найти в разделе &nbsp;
-              <Code color="primary">FAQ</Code>
+              <Link to={"/faq"}>
+                <Code color="primary">FAQ</Code>
+              </Link>
             </span>
           </Snippet>
         </div>

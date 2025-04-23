@@ -60,27 +60,6 @@ export default function NewTicket({
       description: ref.current?.getMarkdown()!,
     };
 
-    if (ref.current?.getMarkdown().trim() == "") {
-      addToast({
-        title: "Ошибка",
-        description: "Пожалуйста, заполните описание проблемы",
-        color: "danger",
-      });
-
-      return;
-    }
-
-    if (data?.terms != "true") {
-      addToast({
-        title: "Ошибка",
-        description:
-          "Пожалуйста, подтвердите согласие на обработку персональных данных",
-        color: "danger",
-      });
-
-      return;
-    }
-
     try {
       const response = await Axios.post("/api/tickets", data, {
         headers: {
@@ -99,9 +78,10 @@ export default function NewTicket({
         color: "success",
       });
     } catch (err: any) {
+      console.log(err);
       addToast({
         title: "Ошибка",
-        description: err.response.data?.message || "Неизвестная ошибка",
+        description: err.response.data?.errors.join("; "),
         color: "danger",
       });
     }
@@ -112,7 +92,6 @@ export default function NewTicket({
       <Form validationBehavior="native" onSubmit={onSubmit}>
         <CardHeader className={"flex justify-around gap-5"}>
           <Input
-            isRequired
             label="Тема"
             name={"title"}
             radius={"lg"}
@@ -120,7 +99,6 @@ export default function NewTicket({
             variant="bordered"
           />
           <Select
-            isRequired
             className="max-w-xs"
             items={issues}
             label="Тип проблемы"

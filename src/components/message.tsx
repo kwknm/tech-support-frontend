@@ -4,6 +4,7 @@ import Linkify from "react-linkify";
 
 import { Attachment } from "@/types";
 import AttachmentCard from "@/components/attachment-card.tsx";
+import { BaselineCheck } from "@/components/icons.tsx";
 
 const formatDate = (timestamp: Date) => {
   const now = moment();
@@ -67,10 +68,18 @@ export const Message = ({
     <>
       <li className="gap-x-2 sm:gap-x-4 me-11 max-w-[90%] flex flex-col">
         <div>
-          <h2 className="max-w-[300px] font-medium text-sm mb-1 text-gray-700 dark:text-gray-300">
-            {fullName}
+          <h2 className="max-w-[300px] flex space-x-2 flex-row text-sm mb-0.5 text-gray-900 dark:text-gray-100">
+            <span>{fullName}</span>
+            {isSupport && (
+              <span className="mt-0.5 flex flex-col text-xs text-gray-500 dark:text-neutral-500">
+                <div className="flex flex-row space-x-0.5 items-center">
+                  <BaselineCheck />
+                  <span className="text-green-500 italic">Поддержка</span>
+                </div>
+              </span>
+            )}
           </h2>
-          <div className="bg-white leading-none border max-w-fit border-gray-200 rounded-2xl px-3 pt-2 pb-1 space-y-3 dark:bg-neutral-900 dark:border-neutral-700">
+          <div className="bg-white leading-none max-w-fit border border-gray-200 shadow dark:border-none rounded-xl px-3 pt-2 pb-1 space-y-3 dark:bg-neutral-900 dark:border-neutral-700">
             <div className="space-y-1.5">
               <p className="text-sm text-gray-800 dark:text-white">
                 <Linkify>{content}</Linkify>
@@ -83,30 +92,6 @@ export const Message = ({
             </div>
           </div>
         </div>
-
-        <span className="mt-1.5 flex gap-x-1 flex-col text-xs text-gray-500 dark:text-neutral-500">
-          {isSupport && (
-            <div className="flex flex-row items-center">
-              <svg
-                className="shrink-0 size-3"
-                fill="none"
-                height="24"
-                stroke="currentColor"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                viewBox="0 0 24 24"
-                width="24"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path d="M18 6 7 17l-5-5" />
-                <path d="m22 10-7.5 7.5L13 16" />
-              </svg>
-              &nbsp;
-              <span className="text-green-500 mb-1.5">Поддержка</span>
-            </div>
-          )}
-        </span>
 
         {attachment && (
           <AttachmentCard

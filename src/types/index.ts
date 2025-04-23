@@ -49,3 +49,22 @@ export type Notification = {
   timestamp: Date;
   metadata?: Metadata;
 };
+
+export type MessageType = {
+  firstName: string;
+  lastName: string;
+  content: string;
+  isSupport: boolean;
+  timestamp: Date;
+  userId: string;
+  attachment?: Attachment;
+};
+
+export type Faq = {
+  id: number;
+  title: string;
+  content: string;
+  authorId: string;
+  createdAt: Date;
+  editedAt?: Date;
+};

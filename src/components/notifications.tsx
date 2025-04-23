@@ -3,7 +3,6 @@ import { HubConnection, HubConnectionBuilder } from "@microsoft/signalr";
 import {
   Badge,
   Button,
-  Chip,
   Dropdown,
   DropdownItem,
   DropdownMenu,
@@ -16,25 +15,7 @@ import moment from "moment/min/moment-with-locales";
 import { BellIcon } from "@/components/icons.tsx";
 import { Axios } from "@/api/api-provider.ts";
 import { Metadata, Notification } from "@/types";
-
-const convertNotificationTypeToTag = (type: string) => {
-  switch (type) {
-    case "new-message":
-      return (
-        <Chip color="primary" size="sm" variant="flat">
-          Чат
-        </Chip>
-      );
-    case "ticket-status-change":
-      return (
-        <Chip color="secondary" size="sm" variant="flat">
-          Заявка
-        </Chip>
-      );
-    default:
-      return <Chip>Другое</Chip>;
-  }
-};
+import { convertNotificationTypeToTag } from "@/lib/utils.tsx";
 
 export default function Notifications() {
   const [connection, setConnection] = useState<HubConnection | null>(null);
@@ -85,35 +66,12 @@ export default function Notifications() {
         console.log("SignalR Notifications Connected");
       });
 
-      connection.on(
-        "ReceiveNotification",
-        (
-          id: string,
-          isRead: boolean,
-          recipientId: string,
-          type: string,
-          title: string,
-          body: string,
-          timestamp: Date,
-          metadata: Metadata,
-        ) => {
-          const newNotif: Notification = {
-            id,
-            isRead,
-            recipientId,
-            title,
-            type,
-            body,
-            timestamp,
-            metadata,
-          };
-
-          setNotifications((prevState) => [newNotif, ...prevState]);
-        },
-      );
+      connection.on("ReceiveNotification", (response: Notification) => {
+        setNotifications((prevState) => [response, ...prevState]);
+      });
 
       return () => {
-        connection.stop();
+        connection.off("ReceiveNotification");
       };
     }
   }, [connection]);

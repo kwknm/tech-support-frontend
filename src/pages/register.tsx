@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { Link as HeroUILink } from "@heroui/react";
 import { useNavigate } from "react-router-dom";
 import { addToast } from "@heroui/toast";
+import React, { useEffect } from "react";
 
 import { title } from "@/components/primitives";
 import { siteConfig } from "@/config/site.ts";
@@ -13,7 +14,9 @@ export default function RegisterPage() {
   const { checkAuth, isLoggedIn } = useAuthStore();
   const navigate = useNavigate();
 
-  if (isLoggedIn) navigate("/");
+  useEffect(() => {
+    if (isLoggedIn) navigate("/");
+  }, [isLoggedIn]);
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -30,8 +33,12 @@ export default function RegisterPage() {
         description: "Теперь вы можете создать заявку",
         color: "success",
       });
-      navigate("/");
-    } catch (err) {
+    } catch (err: any) {
+      addToast({
+        title: "Ошибка",
+        description: err.response.data?.errors.join(", "),
+        color: "danger",
+      });
       console.error(err);
     }
   }

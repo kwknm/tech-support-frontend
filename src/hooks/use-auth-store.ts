@@ -1,4 +1,5 @@
 import { create, Mutate, StoreApi, UseBoundStore } from "zustand";
+import { AxiosError } from "axios";
 
 import { Axios } from "@/api/api-provider.ts";
 
@@ -33,8 +34,16 @@ export const useAuthStore: UseBoundStore<Mutate<StoreApi<IAuthStore>, []>> =
           set({ isLoggedIn: true });
           set({ isSupport: response.data.isSupport });
         } catch (err: any) {
-          set({ token: null, user: null });
-          throw err;
+          if (
+            err instanceof AxiosError &&
+            err.response &&
+            err.response.status === 401
+          ) {
+            localStorage.removeItem("token");
+            set({ token: null, user: null, isLoggedIn: false });
+          } else {
+            throw err;
+          }
         }
       } else {
         set({ isLoggedIn: false });

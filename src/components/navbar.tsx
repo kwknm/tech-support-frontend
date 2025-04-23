@@ -10,10 +10,11 @@ import {
 import { link as linkStyles } from "@heroui/theme";
 import clsx from "clsx";
 import { User, Chip } from "@heroui/react";
+import { LogInIcon, LogOutIcon } from "lucide-react";
 
 import { siteConfig } from "@/config/site";
 import { ThemeSwitch } from "@/components/theme-switch";
-import { ExitIcon, TicketIconLogo } from "@/components/icons";
+import { TicketIconLogo } from "@/components/icons";
 import { useAuthStore } from "@/hooks/use-auth-store.ts";
 import Notifications from "@/components/notifications.tsx";
 
@@ -79,7 +80,7 @@ export const Navbar = () => {
             <Button
               color={"warning"}
               size={"sm"}
-              startContent={<ExitIcon />}
+              startContent={<LogOutIcon size={18} />}
               variant="flat"
               onPress={logoutAction}
             >
@@ -91,6 +92,7 @@ export const Navbar = () => {
             <Button
               as={Link}
               color={"secondary"}
+              startContent={<LogInIcon size={20} />}
               to={siteConfig.links.login}
               variant="flat"
             >

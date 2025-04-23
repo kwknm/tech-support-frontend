@@ -15,6 +15,7 @@ import NotFound from "@/pages/not-found.tsx";
 import TicketDetailsPage from "@/pages/tickets/details.tsx";
 import ChatPage from "@/pages/chat.tsx";
 import DefaultLayout from "@/layouts/default.tsx";
+import FaqPage from "@/pages/faq.tsx";
 
 moment.locale("ru");
 
@@ -71,6 +72,7 @@ function App() {
           }
           path="/tickets/:id/chat"
         />
+        <Route element={<FaqPage />} path="/faq" />
         <Route element={<LoginPage />} path="/login" />
         <Route element={<RegisterPage />} path="/register" />
         <Route element={<NotFound />} path="*" />

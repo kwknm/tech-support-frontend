@@ -1,6 +1,6 @@
 import { Form, Input, Button } from "@heroui/react";
 import { Link } from "react-router-dom";
-import React from "react";
+import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Link as HeroUILink } from "@heroui/react";
 import { addToast } from "@heroui/toast";
@@ -14,7 +14,9 @@ export default function LoginPage() {
   const navigate = useNavigate();
   const { checkAuth, isLoggedIn } = useAuthStore();
 
-  if (isLoggedIn) navigate("/");
+  useEffect(() => {
+    if (isLoggedIn) navigate("/");
+  }, [isLoggedIn]);
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -37,7 +39,6 @@ export default function LoginPage() {
         description: err.response.data?.message,
         color: "danger",
       });
-      navigate("/");
     }
   }
 
