@@ -11,6 +11,7 @@ _Фронтенд для курсового проекта КПИЯП_
 ![Логин](./github-content/login-page.png)
 ![Регистрация](./github-content/register-page.png)
 ![Заявки](./github-content/tickets.png)
+![Details](./github-content/ticket-details.png)
 ![Создание заявки](./github-content/create-a-new-ticket.png)
 ![Детали заявки](./github-content/ticket-page.png)
 ![Чат заявки](./github-content/chat-page.png)
