@@ -5,22 +5,14 @@ import { Button } from "@heroui/react";
 import { Form } from "@heroui/react";
 import React, { useEffect, useState } from "react";
 import "@mdxeditor/editor/style.css";
-import {
-  MDXEditor,
-  headingsPlugin,
-  toolbarPlugin,
-  UndoRedo,
-  BoldItalicUnderlineToggles,
-  quotePlugin,
-  MDXEditorMethods,
-} from "@mdxeditor/editor";
+import { MDXEditorMethods } from "@mdxeditor/editor";
 import { useNavigate } from "react-router-dom";
 import { KeyedMutator } from "swr";
 import { addToast } from "@heroui/toast";
 
 import { Axios } from "@/api/api-provider.ts";
-import { useTheme } from "@/hooks/use-theme.ts";
 import { Ticket } from "@/types";
+import InitializedMDXEditor from "@/components/common/initialized-mdxeditor.tsx";
 
 type SubmitData = {
   title: string;
@@ -36,7 +28,6 @@ export default function NewTicket({
   mutate: KeyedMutator<Ticket[]>;
 }) {
   const [issues, setIssues] = useState([]);
-  const { isDark } = useTheme();
   const ref = React.useRef<MDXEditorMethods>(null);
   const navigate = useNavigate();
 
@@ -114,23 +105,7 @@ export default function NewTicket({
         </CardHeader>
         <Divider className="my-3" />
         <CardBody>
-          <MDXEditor
-            ref={ref}
-            className={isDark ? "dark-theme dark-editor" : ""}
-            markdown={""}
-            plugins={[
-              headingsPlugin(),
-              quotePlugin(),
-              toolbarPlugin({
-                toolbarContents: () => (
-                  <>
-                    <UndoRedo />
-                    <BoldItalicUnderlineToggles />
-                  </>
-                ),
-              }),
-            ]}
-          />
+          <InitializedMDXEditor editorRef={ref} markdown={""} />
         </CardBody>
         <Divider className="my-3" />
         <CardFooter className="flex justify-between gap-3.5">

@@ -5,3 +5,20 @@
 * {
     font-family: "Inter", sans-serif;
 }
+
+.mdx-editor-lists ul
+{
+    list-style: initial;
+    margin: initial;
+    padding: 0 0 0 15px;
+}
+
+.mdx-editor-lists li
+{
+    display: list-item;
+}
+
+.mdx-editor-lists ol {
+    list-style-type: decimal;
+    list-style-position: inside;
+}

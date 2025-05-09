@@ -18,6 +18,7 @@ import moment from "moment/min/moment-with-locales";
 import { Link } from "react-router-dom";
 import React, { useMemo, useState } from "react";
 import { Chip } from "@heroui/chip";
+import { HexagonIcon, WrenchIcon } from "lucide-react";
 
 import { title } from "@/components/primitives.ts";
 import { useAuthStore } from "@/hooks/use-auth-store.ts";
@@ -25,7 +26,6 @@ import {
   CheckPlusIcon,
   DocumentCheckIcon,
   DocumentShieldIcon,
-  ExternalIcon,
 } from "@/components/icons.tsx";
 import { Ticket } from "@/types";
 import { Axios } from "@/api/api-provider.ts";
@@ -94,8 +94,8 @@ export default function TicketsSupportView() {
     try {
       await Axios.post(`/api/tickets/${ticketId}/assign`);
       await mutate();
-    } catch (e) {
-      console.error(e);
+    } catch (err) {
+      console.error(err);
     }
   };
   const [page, setPage] = React.useState(1);
@@ -131,17 +131,6 @@ export default function TicketsSupportView() {
         ),
         actions: (
           <div className="flex gap-1 justify-left items-center">
-            <Tooltip closeDelay={0} content="Перейти к заявке">
-              <Button
-                isIconOnly
-                as={Link}
-                radius="full"
-                to={`/tickets/${ticket.id}`}
-                variant="bordered"
-              >
-                <ExternalIcon />
-              </Button>
-            </Tooltip>
             {!ticket?.supportId && (
               <Tooltip content="Приняться за заявку">
                 <Button
@@ -209,14 +198,16 @@ export default function TicketsSupportView() {
         </div>
       </section>
       <main>
-        <div className="flex justify-between items-center">
-          <div className="flex flex-row gap-5 w-full">
+        <div className="flex justify-between">
+          <div className="flex flex-col gap-2 w-full">
             <Select
               disallowEmptySelection
               className="max-w-[200px]"
               defaultSelectedKeys={["all"]}
               label="Статус"
+              labelPlacement="outside"
               size="sm"
+              startContent={<HexagonIcon />}
               variant="bordered"
               onSelectionChange={(keys) => {
                 setStatusFilter(keys.currentKey!);
@@ -226,11 +217,19 @@ export default function TicketsSupportView() {
                 <SelectItem key={x.key}>{x.label}</SelectItem>
               ))}
             </Select>
-            <Checkbox onValueChange={(value) => setMyAssignment(value)}>
+            <Checkbox
+              size="sm"
+              onValueChange={(value) => setMyAssignment(value)}
+            >
               На моем рассмотрении
             </Checkbox>
           </div>
-          <Button className="flex-shrink-0" variant="bordered" onPress={onOpen}>
+          <Button
+            className="flex-shrink-0"
+            startContent={<WrenchIcon />}
+            variant="bordered"
+            onPress={onOpen}
+          >
             Управление проблемами
           </Button>
         </div>
@@ -268,7 +267,12 @@ export default function TicketsSupportView() {
             loadingContent={<Spinner />}
           >
             {(item: any) => (
-              <TableRow key={item.key}>
+              <TableRow
+                key={item.key}
+                as={Link}
+                className="cursor-pointer"
+                href={`/tickets/${item.key}`}
+              >
                 {(columnKey) => (
                   <TableCell>{getKeyValue(item, columnKey)}</TableCell>
                 )}

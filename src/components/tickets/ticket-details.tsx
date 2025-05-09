@@ -1,6 +1,7 @@
 import {
   Accordion,
   AccordionItem,
+  Button,
   Divider,
   Table,
   TableBody,
@@ -11,21 +12,37 @@ import {
 } from "@heroui/react";
 import { Chip } from "@heroui/chip";
 import moment from "moment/min/moment-with-locales";
-import { MDXEditor } from "@mdxeditor/editor";
+import {
+  headingsPlugin,
+  listsPlugin,
+  markdownShortcutPlugin,
+  MDXEditorMethods,
+  quotePlugin,
+} from "@mdxeditor/editor";
+import { SaveIcon, SquarePenIcon, TextIcon } from "lucide-react";
+import React, { useState } from "react";
+import { addToast } from "@heroui/toast";
+import { KeyedMutator } from "swr";
 
-import { useTheme } from "@/hooks/use-theme.ts";
+import InitializedMDXEditor from "@/components/common/initialized-mdxeditor.tsx";
+import { useAuthStore } from "@/hooks/use-auth-store.ts";
+import { Axios } from "@/api/api-provider.ts";
+import { Ticket } from "@/types";
 
 type Props = {
+  id: number;
   support: { id: string; firstName: string; lastName: string };
-  issuer: { firstName: string; lastName: string };
+  issuer: { id: string; firstName: string; lastName: string };
   createdAt: Date;
   issueType: { name: string };
   description: string;
   closedAt?: Date;
   isClosed: boolean;
+  mutate: KeyedMutator<Ticket>;
 };
 
 export default function TicketDetails({
+  id,
   support,
   issuer,
   createdAt,
@@ -33,8 +50,32 @@ export default function TicketDetails({
   description,
   closedAt,
   isClosed,
+  mutate,
 }: Props) {
-  const { isDark } = useTheme();
+  const { user } = useAuthStore();
+  const [isEditing, setIsEditing] = useState(false);
+  const isAllowedToEdit = user?.id === issuer.id;
+  const [isLoading, setIsLoading] = useState(false);
+  const ref = React.useRef<MDXEditorMethods>(null);
+
+  const updateDescription = async () => {
+    setIsLoading(true);
+
+    try {
+      await Axios.patch(`/api/tickets/${id}`, {
+        description: ref.current?.getMarkdown()!,
+      });
+    } catch {
+      addToast({
+        color: "danger",
+        title: "Произошла неизвестная ошибка",
+      });
+    } finally {
+      setIsLoading(false);
+      setIsEditing(false);
+      await mutate(undefined, { revalidate: true });
+    }
+  };
 
   return (
     <section>
@@ -91,7 +132,20 @@ export default function TicketDetails({
               Дата закрытия
             </TableCell>
             <TableCell>
-              {isClosed ? moment(closedAt).format("LLL") : "Нет"}
+              {isClosed ? (
+                <>
+                  {moment(closedAt).format("LLL")}{" "}
+                  <span className="text-default-500">
+                    (закрыта спустя{" "}
+                    {moment
+                      .duration(moment(closedAt).diff(moment(createdAt)))
+                      .humanize()}
+                    )
+                  </span>
+                </>
+              ) : (
+                "Нет"
+              )}
             </TableCell>
           </TableRow>
         </TableBody>
@@ -99,14 +153,53 @@ export default function TicketDetails({
 
       <Divider className="my-4" />
 
-      <Accordion defaultExpandedKeys={["1"]} variant="bordered">
-        <AccordionItem key="1" title="Описание проблемы">
-          <MDXEditor
-            readOnly
-            className={isDark ? "dark-theme" : ""}
-            markdown={description!}
-            suppressHtmlProcessing={true}
-          />
+      <Accordion defaultExpandedKeys="all" variant="bordered">
+        <AccordionItem
+          key="1"
+          startContent={<TextIcon />}
+          title="Описание проблемы"
+        >
+          {!isEditing && (
+            <InitializedMDXEditor
+              readOnly
+              editorRef={null}
+              markdown={description}
+              plugins={[
+                headingsPlugin(),
+                listsPlugin(),
+                quotePlugin(),
+                markdownShortcutPlugin(),
+              ]}
+            />
+          )}
+          {isEditing && isAllowedToEdit && (
+            <InitializedMDXEditor editorRef={ref} markdown={description} />
+          )}
+
+          {isAllowedToEdit && (
+            <div className="flex w-full justify-end">
+              {isEditing ? (
+                <Button
+                  color="primary"
+                  isLoading={isLoading}
+                  startContent={<SaveIcon />}
+                  variant="flat"
+                  onPress={updateDescription}
+                >
+                  Сохранить
+                </Button>
+              ) : (
+                <Button
+                  color="warning"
+                  startContent={<SquarePenIcon />}
+                  variant="flat"
+                  onPress={() => setIsEditing(true)}
+                >
+                  Редактировать
+                </Button>
+              )}
+            </div>
+          )}
         </AccordionItem>
       </Accordion>
     </section>

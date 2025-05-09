@@ -6,6 +6,7 @@ import {
   NavbarItem,
   NavbarMenuToggle,
   Button,
+  NavbarMenu,
 } from "@heroui/react";
 import { link as linkStyles } from "@heroui/theme";
 import clsx from "clsx";
@@ -24,6 +25,48 @@ export const Navbar = () => {
   const logoutAction = async () => {
     localStorage.removeItem("token");
     await checkAuth();
+  };
+
+  const NavbarAuthStuff = () => {
+    return isLoggedIn ? (
+      <NavbarItem className="hidden md:flex items-center gap-5">
+        <User
+          description={
+            isSupport && (
+              <span>
+                Вы вошли под аккаунтом{" "}
+                <Chip color={"success"} size={"sm"} variant={"flat"}>
+                  Поддержки
+                </Chip>
+              </span>
+            )
+          }
+          name={`${user?.firstName} ${user?.lastName}`}
+        />
+        <Notifications />
+        <Button
+          color={"warning"}
+          size={"sm"}
+          startContent={<LogOutIcon size={18} />}
+          variant="flat"
+          onPress={logoutAction}
+        >
+          Выйти
+        </Button>
+      </NavbarItem>
+    ) : (
+      <NavbarItem className="hidden md:flex">
+        <Button
+          as={Link}
+          color={"secondary"}
+          startContent={<LogInIcon size={20} />}
+          to={siteConfig.links.login}
+          variant="flat"
+        >
+          Войти
+        </Button>
+      </NavbarItem>
+    );
   };
 
   return (
@@ -61,45 +104,7 @@ export const Navbar = () => {
         className="hidden sm:flex basis-1/5 sm:basis-full"
         justify="end"
       >
-        {isLoggedIn ? (
-          <NavbarItem className="hidden md:flex items-center gap-5">
-            <User
-              description={
-                isSupport && (
-                  <span>
-                    Вы вошли под аккаунтом{" "}
-                    <Chip color={"success"} size={"sm"} variant={"flat"}>
-                      Поддержки
-                    </Chip>
-                  </span>
-                )
-              }
-              name={`${user?.firstName} ${user?.lastName}`}
-            />
-            <Notifications />
-            <Button
-              color={"warning"}
-              size={"sm"}
-              startContent={<LogOutIcon size={18} />}
-              variant="flat"
-              onPress={logoutAction}
-            >
-              Выйти
-            </Button>
-          </NavbarItem>
-        ) : (
-          <NavbarItem className="hidden md:flex">
-            <Button
-              as={Link}
-              color={"secondary"}
-              startContent={<LogInIcon size={20} />}
-              to={siteConfig.links.login}
-              variant="flat"
-            >
-              Войти
-            </Button>
-          </NavbarItem>
-        )}
+        <NavbarAuthStuff />
         <NavbarItem className="hidden sm:flex gap-2">
           <ThemeSwitch />
         </NavbarItem>
@@ -109,6 +114,23 @@ export const Navbar = () => {
         <ThemeSwitch />
         <NavbarMenuToggle />
       </NavbarContent>
+
+      <NavbarMenu>
+        {siteConfig.navItems.map((item) => (
+          <NavbarItem key={item.href}>
+            <Link
+              className={clsx(
+                linkStyles({ color: "foreground" }),
+                "data-[active=true]:text-primary data-[active=true]:font-medium",
+              )}
+              color="foreground"
+              to={item.href}
+            >
+              {item.label}
+            </Link>
+          </NavbarItem>
+        ))}
+      </NavbarMenu>
     </HeroUINavbar>
   );
 };

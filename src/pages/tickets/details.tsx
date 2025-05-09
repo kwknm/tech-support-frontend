@@ -1,9 +1,17 @@
 import { useParams } from "react-router";
-import { Spinner, Button, ButtonGroup, Tooltip } from "@heroui/react";
+import {
+  Spinner,
+  Button,
+  ButtonGroup,
+  Tooltip,
+  Accordion,
+  AccordionItem,
+} from "@heroui/react";
 import useSWR from "swr";
 import { Link } from "react-router-dom";
 import { Alert } from "@heroui/alert";
 import { addToast } from "@heroui/toast";
+import { Paperclip } from "lucide-react";
 
 import { Ticket } from "@/types";
 import {
@@ -11,7 +19,6 @@ import {
   CheckPlusIcon,
   CloseIcon,
   ExternalIcon,
-  PaperClipIcon,
 } from "@/components/icons.tsx";
 import TicketDetails from "@/components/tickets/ticket-details.tsx";
 import TicketHeader from "@/components/tickets/ticket-header.tsx";
@@ -179,25 +186,35 @@ export default function TicketDetailsPage() {
           closedAt={data!.closedAt}
           createdAt={data!.createdAt}
           description={data!.description}
+          id={data!.id}
           isClosed={data!.isClosed}
           issueType={data!.issueType}
           issuer={data!.issuer}
+          mutate={mutate}
           support={data!.support!}
         />
-        <span className="flex flex-row items-center">
-          <PaperClipIcon />
-          <h2 className="my-3 text-xl">Приложения</h2>
-        </span>
-        {data?.attachment ? (
-          <AttachmentCard
-            bytesLength={data.attachment.bytesLength}
-            fileExtension={data.attachment.fileExtension}
-            fileName={data.attachment.fileName}
-            id={data.attachment.id}
-          />
-        ) : (
-          <p className="font-light italic">Приложений нет.</p>
-        )}
+        <Accordion
+          className="mt-5"
+          defaultExpandedKeys="all"
+          variant="bordered"
+        >
+          <AccordionItem
+            key="1"
+            startContent={<Paperclip />}
+            title="Приложения"
+          >
+            {data?.attachment ? (
+              <AttachmentCard
+                bytesLength={data.attachment.bytesLength}
+                fileExtension={data.attachment.fileExtension}
+                fileName={data.attachment.fileName}
+                id={data.attachment.id}
+              />
+            ) : (
+              <p className="font-light italic">Приложений нет</p>
+            )}
+          </AccordionItem>
+        </Accordion>
       </div>
     </>
   );

@@ -13,19 +13,20 @@ import {
 } from "@heroui/react";
 import useSWR from "swr";
 import React, { useEffect, useState } from "react";
-import { BugIcon } from "lucide-react";
+import { TrashIcon } from "lucide-react";
 import { addToast } from "@heroui/toast";
 import { AxiosError } from "axios";
 
 import { IssueType } from "@/types";
 import { Axios } from "@/api/api-provider.ts";
+import ConfirmButton from "@/components/common/confirm-button.tsx";
 
 type Props = {
   isOpen: boolean;
   onOpenChange: (isOpen: boolean) => void;
 };
 
-type ListBoxItemProps = { key: number; label: string };
+type ListBoxItemProps = { key: string; label: string };
 
 export default function IssuesModal({ isOpen, onOpenChange }: Props) {
   const { data, isLoading, mutate } = useSWR("/api/tickets/issues", null, {
@@ -82,24 +83,54 @@ export default function IssuesModal({ isOpen, onOpenChange }: Props) {
     }
   };
 
+  const deleteIssue = async (issueId: string) => {
+    try {
+      await Axios.delete(`/api/tickets/issues/${issueId}`);
+      await mutate();
+      addToast({
+        title: "Успешно",
+        color: "success",
+        description: "Проблема успешно удалена",
+      });
+    } catch {
+      addToast({
+        title: "Произошла неизвестная ошибка",
+        color: "danger",
+      });
+    }
+  };
+
   return (
     <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
       <ModalContent>
         {(_) => (
           <>
-            <ModalHeader className="flex flex-col gap-1">
-              Управление проблемами
-            </ModalHeader>
+            <ModalHeader>Управление проблемами</ModalHeader>
             <ModalBody>
-              <Listbox
-                aria-label="Список проблем"
-                items={mappedIssues}
-                topContent="Список проблем:"
-              >
+              <Listbox items={mappedIssues} topContent="Список проблем:">
                 {(item: ListBoxItemProps) => (
                   <ListboxItem
                     key={item.key}
-                    startContent={<BugIcon className="text-danger" size={20} />}
+                    endContent={
+                      <ConfirmButton
+                        confirmButtonColor={"danger"}
+                        confirmText={"Удалить"}
+                        popoverContent={"Уверены, что хотите удалить элемент?"}
+                        triggerElement={
+                          <Button isIconOnly size="sm" variant="light">
+                            <TrashIcon
+                              className="text-danger"
+                              color="currentColor"
+                              size={22}
+                            />
+                          </Button>
+                        }
+                        onPressed={async () => {
+                          await deleteIssue(item.key);
+                        }}
+                      />
+                    }
+                    startContent={"–"}
                   >
                     {item.label}
                   </ListboxItem>

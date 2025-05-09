@@ -4,6 +4,13 @@ export type IconSvgProps = SVGProps<SVGSVGElement> & {
   size?: number;
 };
 
+export type User = {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+};
+
 export type Attachment = {
   bytes: string;
   bytesLength: number;
@@ -19,10 +26,10 @@ export type Ticket = {
   title: string;
   description: string;
   supportId?: string;
-  support?: { id: string; firstName: string; lastName: string; email: string };
+  support?: User;
   issueType: IssueType;
   issuerId: string;
-  issuer: { id: string; firstName: string; lastName: string; email: string };
+  issuer: User;
   createdAt: Date;
   closedAt?: Date;
   isClosed: boolean;
@@ -65,6 +72,8 @@ export type Faq = {
   title: string;
   content: string;
   authorId: string;
+  author: User;
+  likes: string[];
   createdAt: Date;
   editedAt?: Date;
 };

@@ -15,6 +15,7 @@ import useSWR from "swr";
 import moment from "moment/min/moment-with-locales";
 import { Link } from "react-router-dom";
 import React from "react";
+import { Chip } from "@heroui/chip";
 
 import { title } from "@/components/primitives.ts";
 import { useAuthStore } from "@/hooks/use-auth-store.ts";
@@ -86,9 +87,13 @@ export default function TicketsUserView() {
       status: convertStatusToTag(ticket.status),
       issueType: ticket.issueType.name,
       createdAt: moment(ticket.createdAt).format("ll"),
-      support: ticket.supportId
-        ? ticket.support!.firstName + " " + ticket.support!.lastName
-        : "Нет",
+      support: ticket.supportId ? (
+        ticket.support!.firstName + " " + ticket.support!.lastName
+      ) : (
+        <Chip radius="sm" variant="bordered">
+          Нет
+        </Chip>
+      ),
       actions: (
         <div className="flex gap-1 justify-left items-center">
           <Tooltip closeDelay={0} content="Перейти к заявке">
