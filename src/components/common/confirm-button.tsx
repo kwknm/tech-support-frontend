@@ -2,10 +2,9 @@ import { Button, Popover, PopoverContent, PopoverTrigger } from "@heroui/react";
 import React from "react";
 
 type Props = {
-  triggerElement: React.ReactNode;
   popoverContent: React.ReactNode;
   confirmText: React.ReactNode;
-  onPressed: () => void;
+  onOk: () => void;
   confirmButtonColor?:
     | "default"
     | "primary"
@@ -14,34 +13,49 @@ type Props = {
     | "warning"
     | "danger"
     | undefined;
+  confirmButtonVariant?:
+    | "shadow"
+    | "faded"
+    | "solid"
+    | "bordered"
+    | "light"
+    | "flat"
+    | "ghost"
+    | undefined;
+  children: React.ReactNode;
 };
 
 export default function ConfirmButton({
-  triggerElement,
   popoverContent,
   confirmText,
-  onPressed,
-  confirmButtonColor,
+  onOk,
+  confirmButtonColor = "default",
+  confirmButtonVariant = "flat",
+  children,
 }: Props) {
   const [isOpen, setIsOpen] = React.useState(false);
 
   return (
     <Popover
-      backdrop="blur"
+      backdrop="opaque"
       isOpen={isOpen}
-      placement="bottom"
-      showArrow={false}
+      placement="top"
+      showArrow={true}
       onOpenChange={(open) => setIsOpen(open)}
     >
-      <PopoverTrigger>{triggerElement}</PopoverTrigger>
+      <PopoverTrigger>{children}</PopoverTrigger>
+
       <PopoverContent>
         <div className="px-2 py-2">
-          <div className="text-small font-semibold mb-3">{popoverContent}</div>
+          <div className="text-small mb-3">{popoverContent}</div>
           <Button
             color={confirmButtonColor}
             size="sm"
-            variant="faded"
-            onPress={onPressed}
+            variant={confirmButtonVariant}
+            onPress={() => {
+              onOk();
+              setIsOpen(false);
+            }}
           >
             {confirmText}
           </Button>

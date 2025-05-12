@@ -8,7 +8,6 @@ import {
   getKeyValue,
   Tooltip,
   Pagination,
-  Button,
   User,
 } from "@heroui/react";
 import useSWR from "swr";
@@ -19,15 +18,14 @@ import { Chip } from "@heroui/chip";
 
 import { title } from "@/components/primitives.ts";
 import { useAuthStore } from "@/hooks/use-auth-store.ts";
-import NewTicket from "@/components/new-ticket.tsx";
-import { ExternalIcon } from "@/components/icons.tsx";
+import NewTicket from "@/components/tickets/new-ticket.tsx";
 import { Ticket } from "@/types";
-import { convertStatusToTag } from "@/pages/tickets";
+import { convertStatusToTag } from "@/lib/utils.tsx";
 
 const columns = [
   {
     key: "id",
-    label: "ID",
+    label: "#",
   },
   {
     key: "issuer",
@@ -53,10 +51,6 @@ const columns = [
     key: "support",
     label: "ОТВЕТСТВЕННЫЙ",
   },
-  {
-    key: "actions",
-    label: "ДЕЙСТВИЯ",
-  },
 ];
 
 export default function TicketsUserView() {
@@ -73,6 +67,9 @@ export default function TicketsUserView() {
       id: "#" + ticket.id,
       issuer: (
         <User
+          avatarProps={{
+            name: `${user?.firstName[0]}${user?.lastName[0]}`,
+          }}
           description={ticket.issuer.email}
           name={ticket.issuer.firstName + " " + ticket.issuer.lastName}
         />
@@ -93,20 +90,6 @@ export default function TicketsUserView() {
         <Chip radius="sm" variant="bordered">
           Нет
         </Chip>
-      ),
-      actions: (
-        <div className="flex gap-1 justify-left items-center">
-          <Tooltip closeDelay={0} content="Перейти к заявке">
-            <Button
-              isIconOnly
-              as={Link}
-              to={`/tickets/${ticket.id}`}
-              variant="bordered"
-            >
-              <ExternalIcon />
-            </Button>
-          </Tooltip>
-        </div>
       ),
     })) ?? [];
 
@@ -168,7 +151,12 @@ export default function TicketsUserView() {
             loadingContent={<Spinner />}
           >
             {(item: any) => (
-              <TableRow key={item.key}>
+              <TableRow
+                key={item.key}
+                as={Link}
+                className="cursor-pointer"
+                href={`/tickets/${item.key}`}
+              >
                 {(columnKey) => (
                   <TableCell>{getKeyValue(item, columnKey)}</TableCell>
                 )}

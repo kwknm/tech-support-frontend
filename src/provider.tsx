@@ -15,7 +15,7 @@ export function Provider({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate();
 
   return (
-    <HeroUIProvider navigate={navigate} spinnerVariant="dots" useHref={useHref}>
+    <HeroUIProvider navigate={navigate} useHref={useHref}>
       <ToastProvider placement={"top-center"} toastProps={{ timeout: 2500 }} />
       {children}
     </HeroUIProvider>

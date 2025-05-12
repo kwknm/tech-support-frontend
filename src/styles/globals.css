@@ -1,8 +1,10 @@
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-* {
+body {
     font-family: "Inter", sans-serif;
 }
 
@@ -10,7 +12,7 @@
 {
     list-style: initial;
     margin: initial;
-    padding: 0 0 0 15px;
+    padding: 0 0 0 20px;
 }
 
 .mdx-editor-lists li
@@ -21,4 +23,22 @@
 .mdx-editor-lists ol {
     list-style-type: decimal;
     list-style-position: inside;
+}
+
+.mdxeditor p:not(:last-child) {
+    margin-bottom: 1em;
+}
+
+.mdxeditor {
+    font-family: "Manrope", sans-serif!important;
+}
+
+pre {
+    font-family: "Manrope", sans-serif!important;
+    letter-spacing: 0.025em;
+    font-weight: 600!important;
+}
+
+.message-content a {
+    text-decoration: underline;
 }

@@ -3,7 +3,7 @@ import { Tooltip } from "@heroui/react";
 import Linkify from "react-linkify";
 
 import { Attachment } from "@/types";
-import AttachmentCard from "@/components/attachment-card.tsx";
+import AttachmentCard from "@/components/common/attachment-card.tsx";
 import { BaselineCheck } from "@/components/icons.tsx";
 
 const formatDate = (timestamp: Date) => {
@@ -44,7 +44,7 @@ export const Message = ({
         <div className="grow text-end">
           <div className="inline-flex flex-col gap-2 items-end">
             <div className="inline-block leading-none bg-blue-500 dark:bg-blue-600 rounded-xl px-3 pt-2 pb-1 shadow-lg">
-              <p className="text-md text-white text-start">
+              <p className="text-md text-white text-start message-content">
                 <Linkify>{content}</Linkify>
               </p>
               <Tooltip closeDelay={0} content={formattedFull}>
@@ -67,7 +67,7 @@ export const Message = ({
   return (
     <>
       <li className="gap-x-2 sm:gap-x-4 me-11 max-w-[90%] flex flex-col">
-        <div>
+        <div className="mb-2">
           <h2 className="max-w-[300px] flex space-x-2 flex-row text-sm mb-0.5 text-gray-900 dark:text-gray-100">
             <span>{fullName}</span>
             {isSupport && (

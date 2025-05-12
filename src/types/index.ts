@@ -31,6 +31,7 @@ export type Ticket = {
   issuerId: string;
   issuer: User;
   createdAt: Date;
+  editedAt?: Date;
   closedAt?: Date;
   isClosed: boolean;
   chatId: string;

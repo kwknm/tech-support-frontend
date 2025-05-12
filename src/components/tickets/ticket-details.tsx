@@ -1,8 +1,4 @@
 import {
-  Accordion,
-  AccordionItem,
-  Button,
-  Divider,
   Table,
   TableBody,
   TableCell,
@@ -12,80 +8,35 @@ import {
 } from "@heroui/react";
 import { Chip } from "@heroui/chip";
 import moment from "moment/min/moment-with-locales";
-import {
-  headingsPlugin,
-  listsPlugin,
-  markdownShortcutPlugin,
-  MDXEditorMethods,
-  quotePlugin,
-} from "@mdxeditor/editor";
-import { SaveIcon, SquarePenIcon, TextIcon } from "lucide-react";
-import React, { useState } from "react";
-import { addToast } from "@heroui/toast";
-import { KeyedMutator } from "swr";
 
-import InitializedMDXEditor from "@/components/common/initialized-mdxeditor.tsx";
-import { useAuthStore } from "@/hooks/use-auth-store.ts";
-import { Axios } from "@/api/api-provider.ts";
-import { Ticket } from "@/types";
+import { User } from "@/types";
 
 type Props = {
   id: number;
-  support: { id: string; firstName: string; lastName: string };
-  issuer: { id: string; firstName: string; lastName: string };
+  support: User;
+  issuer: User;
   createdAt: Date;
   issueType: { name: string };
-  description: string;
   closedAt?: Date;
   isClosed: boolean;
-  mutate: KeyedMutator<Ticket>;
 };
 
 export default function TicketDetails({
-  id,
   support,
   issuer,
   createdAt,
   issueType,
-  description,
   closedAt,
   isClosed,
-  mutate,
 }: Props) {
-  const { user } = useAuthStore();
-  const [isEditing, setIsEditing] = useState(false);
-  const isAllowedToEdit = user?.id === issuer.id;
-  const [isLoading, setIsLoading] = useState(false);
-  const ref = React.useRef<MDXEditorMethods>(null);
-
-  const updateDescription = async () => {
-    setIsLoading(true);
-
-    try {
-      await Axios.patch(`/api/tickets/${id}`, {
-        description: ref.current?.getMarkdown()!,
-      });
-    } catch {
-      addToast({
-        color: "danger",
-        title: "Произошла неизвестная ошибка",
-      });
-    } finally {
-      setIsLoading(false);
-      setIsEditing(false);
-      await mutate(undefined, { revalidate: true });
-    }
-  };
-
   return (
     <section>
-      <h2 className="text-3xl font-light mt-6">Сведения</h2>
-      <Divider className="my-4" />
-
       <Table
         hideHeader
+        isCompact
         removeWrapper
         aria-label="Сведения"
+        className="bg-gray-100 dark:bg-zinc-900 my-10 border-solid border-2 dark:border-zinc-800 rounded-md"
         isHeaderSticky={false}
       >
         <TableHeader>
@@ -99,7 +50,9 @@ export default function TicketDetails({
             </TableCell>
             <TableCell>
               {support ? (
-                `${support.firstName} ${support.lastName}`
+                <Chip color="success" variant="dot">
+                  {support.firstName} {support.lastName}
+                </Chip>
               ) : (
                 <Chip color="danger" variant="dot">
                   Нет
@@ -150,58 +103,6 @@ export default function TicketDetails({
           </TableRow>
         </TableBody>
       </Table>
-
-      <Divider className="my-4" />
-
-      <Accordion defaultExpandedKeys="all" variant="bordered">
-        <AccordionItem
-          key="1"
-          startContent={<TextIcon />}
-          title="Описание проблемы"
-        >
-          {!isEditing && (
-            <InitializedMDXEditor
-              readOnly
-              editorRef={null}
-              markdown={description}
-              plugins={[
-                headingsPlugin(),
-                listsPlugin(),
-                quotePlugin(),
-                markdownShortcutPlugin(),
-              ]}
-            />
-          )}
-          {isEditing && isAllowedToEdit && (
-            <InitializedMDXEditor editorRef={ref} markdown={description} />
-          )}
-
-          {isAllowedToEdit && (
-            <div className="flex w-full justify-end">
-              {isEditing ? (
-                <Button
-                  color="primary"
-                  isLoading={isLoading}
-                  startContent={<SaveIcon />}
-                  variant="flat"
-                  onPress={updateDescription}
-                >
-                  Сохранить
-                </Button>
-              ) : (
-                <Button
-                  color="warning"
-                  startContent={<SquarePenIcon />}
-                  variant="flat"
-                  onPress={() => setIsEditing(true)}
-                >
-                  Редактировать
-                </Button>
-              )}
-            </div>
-          )}
-        </AccordionItem>
-      </Accordion>
     </section>
   );
 }

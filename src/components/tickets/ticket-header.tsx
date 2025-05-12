@@ -1,5 +1,5 @@
 import { TicketIcon } from "@/components/icons.tsx";
-import { convertStatusToTag } from "@/pages/tickets";
+import { convertStatusToTag } from "@/lib/utils.tsx";
 
 type Props = {
   id: number;

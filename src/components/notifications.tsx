@@ -36,13 +36,9 @@ export default function Notifications() {
   ) => {
     switch (notificationType) {
       case "new-message":
-        return () => {
-          navigate(`/tickets/${meta?.resourceId}/chat`);
-        };
+        return navigate(`/tickets/${meta?.resourceId}/chat`);
       case "ticket-status-change":
-        return () => {
-          navigate(`/tickets/${meta?.resourceId}`);
-        };
+        return navigate(`/tickets/${meta?.resourceId}`);
     }
   };
 
@@ -131,7 +127,7 @@ export default function Notifications() {
                   }
                   startContent={convertNotificationTypeToTag(n.type)}
                   textValue={n.title}
-                  onPress={mapNotificationBehavior(n.type, n.metadata)}
+                  onPress={() => mapNotificationBehavior(n.type, n.metadata)}
                 >
                   {n.title}
                 </DropdownItem>
@@ -165,9 +161,7 @@ export default function Notifications() {
                 }
                 startContent={convertNotificationTypeToTag(n.type)}
                 textValue={n.title}
-                onPress={(_) =>
-                  navigate(`/tickets/${n.metadata?.resourceId}/chat`)
-                }
+                onPress={(_) => mapNotificationBehavior(n.type, n.metadata)}
               >
                 {n.title}
               </DropdownItem>

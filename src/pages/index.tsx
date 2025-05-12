@@ -4,6 +4,7 @@ import { button as buttonStyles } from "@heroui/theme";
 import { Link } from "react-router-dom";
 
 import { title, subtitle } from "@/components/primitives";
+import { ClipboardListIcon } from "lucide-react";
 
 export default function IndexPage() {
   return (
@@ -31,6 +32,7 @@ export default function IndexPage() {
             })}
             to={"/tickets"}
           >
+            <ClipboardListIcon />
             Оставить заявку
           </Link>
         </div>

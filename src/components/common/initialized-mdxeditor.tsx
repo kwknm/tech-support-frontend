@@ -10,7 +10,8 @@ import {
   toolbarPlugin,
   UndoRedo,
   BoldItalicUnderlineToggles,
-  CodeToggle, ListsToggle
+  CodeToggle,
+  ListsToggle,
 } from "@mdxeditor/editor";
 
 import { useTheme } from "@/hooks/use-theme.ts";
@@ -24,7 +25,7 @@ export default function InitializedMDXEditor({
   return (
     <MDXEditor
       className={isDark ? "dark-theme dark-editor w-full" : "w-full"}
-      contentEditableClassName="mdx-editor-lists"
+      contentEditableClassName="mdx-editor-lists p-0 m-0"
       plugins={[
         headingsPlugin(),
         listsPlugin(),

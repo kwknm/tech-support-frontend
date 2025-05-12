@@ -12,14 +12,17 @@ import { addToast } from "@heroui/toast";
 import "@mdxeditor/editor/style.css";
 import { MDXEditorMethods } from "@mdxeditor/editor";
 import React from "react";
+import { KeyedMutator } from "swr";
+import { FileQuestionIcon } from "lucide-react";
 
 import InitializedMDXEditor from "@/components/common/initialized-mdxeditor.tsx";
 import { Axios } from "@/api/api-provider.ts";
+import { Faq } from "@/types";
 
 type Props = {
   isOpen: boolean;
   onOpenChange: (isOpen: boolean) => void;
-  mutate: () => Promise<void>;
+  mutate: KeyedMutator<Faq[]>;
 };
 
 export default function AddFaqModal({ isOpen, onOpenChange, mutate }: Props) {
@@ -79,7 +82,9 @@ export default function AddFaqModal({ isOpen, onOpenChange, mutate }: Props) {
       <ModalContent>
         {(_) => (
           <>
-            <ModalHeader>Добавление элемента FAQ</ModalHeader>
+            <ModalHeader className="flex items-center gap-1.5">
+              <FileQuestionIcon /> Добавление элемента FAQ
+            </ModalHeader>
             <Divider />
             <ModalBody>
               <Form className="w-full" onSubmit={onSubmit}>

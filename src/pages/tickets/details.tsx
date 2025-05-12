@@ -8,23 +8,19 @@ import {
   AccordionItem,
 } from "@heroui/react";
 import useSWR from "swr";
-import { Link } from "react-router-dom";
 import { Alert } from "@heroui/alert";
 import { addToast } from "@heroui/toast";
 import { Paperclip } from "lucide-react";
 
 import { Ticket } from "@/types";
-import {
-  CheckIcon,
-  CheckPlusIcon,
-  CloseIcon,
-  ExternalIcon,
-} from "@/components/icons.tsx";
+import { CheckIcon, CheckPlusIcon, CloseIcon } from "@/components/icons.tsx";
 import TicketDetails from "@/components/tickets/ticket-details.tsx";
 import TicketHeader from "@/components/tickets/ticket-header.tsx";
 import { Axios } from "@/api/api-provider.ts";
 import { useAuthStore } from "@/hooks/use-auth-store.ts";
-import AttachmentCard from "@/components/attachment-card.tsx";
+import AttachmentCard from "@/components/common/attachment-card.tsx";
+import TicketDescription from "@/components/tickets/ticket-description.tsx";
+import TabSwitch from "@/components/tickets/tab-switch.tsx";
 
 export default function TicketDetailsPage() {
   const { id } = useParams();
@@ -113,7 +109,7 @@ export default function TicketDetailsPage() {
         title={data!.title}
       />
       <div className="my-5">
-        <div className="flex justify-between">
+        <div className="flex justify-between flex-col sm:justify-items-start sm:flex-row">
           {!data?.supportId && isSupport ? (
             <Button
               color="success"
@@ -131,19 +127,15 @@ export default function TicketDetailsPage() {
                 isDisabled={!!data?.supportId}
               >
                 <span>
-                  <Button
-                    as={Link}
+                  <TabSwitch
+                    currentTab={"details"}
                     isDisabled={
                       (user?.id != data?.issuerId &&
                         user?.id != data?.supportId) ||
                       !data?.supportId
                     }
-                    startContent={<ExternalIcon />}
-                    to={`/tickets/${id}/chat`}
-                    variant="shadow"
-                  >
-                    К чату
-                  </Button>
+                    ticketId={data?.id!}
+                  />
                 </span>
               </Tooltip>
 
@@ -160,8 +152,8 @@ export default function TicketDetailsPage() {
                   <ButtonGroup>
                     <Button
                       color={"success"}
-                      endContent={<CheckIcon className={"text-success"} />}
                       isDisabled={data?.isClosed || user?.id != data?.supportId}
+                      startContent={<CheckIcon className={"text-success"} />}
                       variant="faded"
                       onPress={closeTicket}
                     >
@@ -169,8 +161,8 @@ export default function TicketDetailsPage() {
                     </Button>
                     <Button
                       color={"danger"}
-                      endContent={<CloseIcon className={"text-danger"} />}
                       isDisabled={data?.isClosed || user?.id != data?.supportId}
+                      startContent={<CloseIcon className={"text-danger"} />}
                       variant="faded"
                       onPress={rejectTicket}
                     >
@@ -185,19 +177,20 @@ export default function TicketDetailsPage() {
         <TicketDetails
           closedAt={data!.closedAt}
           createdAt={data!.createdAt}
-          description={data!.description}
           id={data!.id}
           isClosed={data!.isClosed}
           issueType={data!.issueType}
           issuer={data!.issuer}
-          mutate={mutate}
           support={data!.support!}
         />
-        <Accordion
-          className="mt-5"
-          defaultExpandedKeys="all"
-          variant="bordered"
-        >
+        <TicketDescription
+          description={data?.description!}
+          editedAt={data?.editedAt}
+          id={data?.id!}
+          issuerId={data?.issuerId!}
+          mutate={mutate}
+        />
+        <Accordion className="mt-5" defaultExpandedKeys="all" variant="shadow">
           <AccordionItem
             key="1"
             startContent={<Paperclip />}

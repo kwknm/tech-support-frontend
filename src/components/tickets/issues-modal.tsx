@@ -13,7 +13,7 @@ import {
 } from "@heroui/react";
 import useSWR from "swr";
 import React, { useEffect, useState } from "react";
-import { TrashIcon } from "lucide-react";
+import { BugIcon, Trash2Icon } from "lucide-react";
 import { addToast } from "@heroui/toast";
 import { AxiosError } from "axios";
 
@@ -105,7 +105,10 @@ export default function IssuesModal({ isOpen, onOpenChange }: Props) {
       <ModalContent>
         {(_) => (
           <>
-            <ModalHeader>Управление проблемами</ModalHeader>
+            <ModalHeader className="flex items-center gap-1.5">
+              <BugIcon size={22} />
+              Управление проблемами
+            </ModalHeader>
             <ModalBody>
               <Listbox items={mappedIssues} topContent="Список проблем:">
                 {(item: ListBoxItemProps) => (
@@ -116,19 +119,18 @@ export default function IssuesModal({ isOpen, onOpenChange }: Props) {
                         confirmButtonColor={"danger"}
                         confirmText={"Удалить"}
                         popoverContent={"Уверены, что хотите удалить элемент?"}
-                        triggerElement={
-                          <Button isIconOnly size="sm" variant="light">
-                            <TrashIcon
-                              className="text-danger"
-                              color="currentColor"
-                              size={22}
-                            />
-                          </Button>
-                        }
-                        onPressed={async () => {
+                        onOk={async () => {
                           await deleteIssue(item.key);
                         }}
-                      />
+                      >
+                        <Button isIconOnly size="sm" variant="light">
+                          <Trash2Icon
+                            className="text-danger"
+                            color="currentColor"
+                            size={22}
+                          />
+                        </Button>
+                      </ConfirmButton>
                     }
                     startContent={"–"}
                   >

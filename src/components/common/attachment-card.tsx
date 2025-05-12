@@ -24,7 +24,7 @@ export default function AttachmentCard({
       <Snippet
         disableCopy
         as={Link}
-        className="max-w-[250px]"
+        className="max-w-[250px] border-secondary-200 border-2"
         color="secondary"
         copyIcon={<FileIcon size={32} />}
         symbol={

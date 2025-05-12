@@ -1,5 +1,44 @@
 import { Chip } from "@heroui/react";
 
+export const convertStatusToTag = (
+  status: number | undefined,
+  size: "sm" | "md" | "lg" | undefined = "md",
+  radius: "sm" | "md" | "lg" | undefined = "md",
+) => {
+  switch (status) {
+    case 0:
+      return (
+        <Chip color="default" radius={radius} size={size} variant="flat">
+          Открыта
+        </Chip>
+      );
+    case 1:
+      return (
+        <Chip color="primary" radius={radius} size={size} variant="flat">
+          Обрабатывается
+        </Chip>
+      );
+    case 2:
+      return (
+        <Chip color="success" radius={radius} size={size} variant="flat">
+          Решена
+        </Chip>
+      );
+    case 3:
+      return (
+        <Chip color="danger" radius={radius} size={size} variant="flat">
+          Отклонена
+        </Chip>
+      );
+    default:
+      return (
+        <Chip color="default" radius={radius} size={size} variant="flat">
+          Неизвестен
+        </Chip>
+      );
+  }
+};
+
 export const convertNotificationTypeToTag = (type: string) => {
   switch (type) {
     case "new-message":
@@ -27,4 +66,14 @@ export const formatBytes = (bytes: number, decimals = 2) => {
   const i = Math.floor(Math.log(bytes) / Math.log(k));
 
   return `${parseFloat((bytes / Math.pow(k, i)).toFixed(decimals))} ${sizes[i]}`;
-}
+};
+
+export const getStatusDict = () => {
+  return [
+    { key: "all", label: "Все" },
+    { key: "0", label: "Открыта" },
+    { key: "1", label: "Обрабатывается" },
+    { key: "2", label: "Решена" },
+    { key: "3", label: "Отклонена" },
+  ];
+};

@@ -31,6 +31,9 @@ export const Navbar = () => {
     return isLoggedIn ? (
       <NavbarItem className="hidden md:flex items-center gap-5">
         <User
+          avatarProps={{
+            name: `${user?.firstName[0]}${user?.lastName[0]}`,
+          }}
           description={
             isSupport && (
               <span>

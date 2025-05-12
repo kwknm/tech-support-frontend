@@ -10,18 +10,18 @@ import { HubConnection, HubConnectionBuilder } from "@microsoft/signalr";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router";
 import useSWR from "swr";
-import { Link } from "react-router-dom";
 import { Alert } from "@heroui/alert";
 import { AxiosError } from "axios";
 import { addToast } from "@heroui/toast";
 
-import { ExternalIcon, PaperClipIcon, PlaneIcon } from "@/components/icons.tsx";
+import { PaperClipIcon, PlaneIcon } from "@/components/icons.tsx";
 import { Message } from "@/components/message.tsx";
 import TicketHeader from "@/components/tickets/ticket-header.tsx";
 import { Ticket, MessageType } from "@/types";
 import { Axios } from "@/api/api-provider.ts";
 import { useAuthStore } from "@/hooks/use-auth-store.ts";
 import { siteConfig } from "@/config/site.ts";
+import TabSwitch from "@/components/tickets/tab-switch.tsx";
 
 const scrollToChatBottom = () =>
   document.getElementById("scroll")?.scrollIntoView({
@@ -154,10 +154,10 @@ const ChatPage = () => {
       />
     );
 
-  if (isLoading || messagesIsLoading)
+  if (isLoading)
     return (
       <div className="flex justify-center">
-        <Spinner />
+        <Spinner variant="dots" />
       </div>
     );
 
@@ -169,15 +169,14 @@ const ChatPage = () => {
         status={data!.status}
         title={data!.title}
       />
-      <Button
-        as={Link}
-        className="mt-5"
-        startContent={<ExternalIcon />}
-        to={`/tickets/${id}`}
-        variant="shadow"
-      >
-        К заявке
-      </Button>
+      <TabSwitch
+        currentTab={"chat"}
+        isDisabled={
+          (user?.id != data?.issuerId && user?.id != data?.supportId) ||
+          !data?.supportId
+        }
+        ticketId={data?.id!}
+      />
       <section className="flex flex-col items-center my-5">
         <h2 className="text-light text-3xl text-gray-700 mb-4 dark:text-gray-200 decoration-dashed">
           Обсуждение
@@ -206,31 +205,37 @@ const ChatPage = () => {
               variant="flat"
             />
           )}
-          <ul
-            className="space-y-2 h-[500px] overflow-y-auto w-[600px] mb-5 [&::-webkit-scrollbar]:w-2
+          {messagesIsLoading ? (
+            <div className="h-[500px] flex justify-center items-center w-[600px]">
+              <Spinner label="Загружаем сообщения..." />
+            </div>
+          ) : (
+            <ul
+              className="space-y-2 h-[500px] overflow-y-auto w-[600px] [&::-webkit-scrollbar]:w-2
                       [&::-webkit-scrollbar-track]:bg-gray-100
                       [&::-webkit-scrollbar-thumb]:bg-gray-300
                       dark:[&::-webkit-scrollbar-track]:bg-neutral-700
                       dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500
                        [&::-webkit-scrollbar-track]:rounded-full
                        [&::-webkit-scrollbar-thumb]:rounded-full pr-2"
-          >
-            {messages?.map((m, idx) => (
-              <Message
-                key={m.content + idx}
-                attachment={m.attachment}
-                content={m.content}
-                firstName={m.firstName}
-                isSupport={m.isSupport}
-                isUsersMessage={m.userId == user?.id}
-                lastName={m.lastName}
-                timestamp={m.timestamp}
-              />
-            ))}
-            <div id="scroll" />
-          </ul>
+            >
+              {messages?.map((m, idx) => (
+                <Message
+                  key={m.content + idx}
+                  attachment={m.attachment}
+                  content={m.content}
+                  firstName={m.firstName}
+                  isSupport={m.isSupport}
+                  isUsersMessage={m.userId == user?.id}
+                  lastName={m.lastName}
+                  timestamp={m.timestamp}
+                />
+              ))}
+              <div id="scroll" />
+            </ul>
+          )}
         </div>
-        <Form className="flex flex-row gap-1" onSubmit={sendMessage}>
+        <Form className="flex flex-row gap-1 mt-3" onSubmit={sendMessage}>
           <Tooltip content="Добавить вложение">
             <Button
               isIconOnly

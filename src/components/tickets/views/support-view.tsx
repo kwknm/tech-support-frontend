@@ -18,25 +18,26 @@ import moment from "moment/min/moment-with-locales";
 import { Link } from "react-router-dom";
 import React, { useMemo, useState } from "react";
 import { Chip } from "@heroui/chip";
-import { HexagonIcon, WrenchIcon } from "lucide-react";
+import {
+  TicketCheckIcon,
+  HexagonIcon,
+  WrenchIcon,
+  TicketPlusIcon,
+  ShieldIcon,
+} from "lucide-react";
 
 import { title } from "@/components/primitives.ts";
 import { useAuthStore } from "@/hooks/use-auth-store.ts";
-import {
-  CheckPlusIcon,
-  DocumentCheckIcon,
-  DocumentShieldIcon,
-} from "@/components/icons.tsx";
 import { Ticket } from "@/types";
 import { Axios } from "@/api/api-provider.ts";
-import { convertStatusToTag } from "@/pages/tickets";
 import { siteConfig } from "@/config/site.ts";
-import IssuesModal from "@/components/issues-modal.tsx";
+import IssuesModal from "@/components/tickets/issues-modal.tsx";
+import { convertStatusToTag, getStatusDict } from "@/lib/utils.tsx";
 
 const columns = [
   {
     key: "id",
-    label: "ID",
+    label: "#",
   },
   {
     key: "issuer",
@@ -66,14 +67,6 @@ const columns = [
     key: "actions",
     label: "ДЕЙСТВИЯ",
   },
-];
-
-const statusDict = [
-  { key: "all", label: "Все" },
-  { key: "0", label: "Открыта" },
-  { key: "1", label: "Обрабатывается" },
-  { key: "2", label: "Решена" },
-  { key: "3", label: "Отклонена" },
 ];
 
 export default function TicketsSupportView() {
@@ -108,6 +101,9 @@ export default function TicketsSupportView() {
         id: "#" + ticket.id,
         issuer: (
           <User
+            avatarProps={{
+              name: `${user?.firstName[0]}${user?.lastName[0]}`,
+            }}
             description={ticket.issuer.email}
             name={ticket.issuer.firstName + " " + ticket.issuer.lastName}
           />
@@ -141,7 +137,7 @@ export default function TicketsSupportView() {
                     await assignTicket(ticket.id);
                   }}
                 >
-                  <CheckPlusIcon />
+                  <TicketPlusIcon />
                 </Button>
               </Tooltip>
             )}
@@ -156,7 +152,7 @@ export default function TicketsSupportView() {
                   radius="full"
                   variant="bordered"
                 >
-                  <DocumentShieldIcon className="text-warning" />
+                  <ShieldIcon className="text-warning" />
                 </Button>
               </Tooltip>
             )}
@@ -168,7 +164,7 @@ export default function TicketsSupportView() {
                   radius="full"
                   variant="bordered"
                 >
-                  <DocumentCheckIcon className="text-success" />
+                  <TicketCheckIcon className="text-success" />
                 </Button>
               </Tooltip>
             )}
@@ -213,7 +209,7 @@ export default function TicketsSupportView() {
                 setStatusFilter(keys.currentKey!);
               }}
             >
-              {statusDict.map((x) => (
+              {getStatusDict().map((x) => (
                 <SelectItem key={x.key}>{x.label}</SelectItem>
               ))}
             </Select>
@@ -234,7 +230,7 @@ export default function TicketsSupportView() {
           </Button>
         </div>
         <div>
-          <Chip className="my-3" radius="sm">
+          <Chip className="my-3" color="primary" radius="sm" variant="dot">
             {data?.length ?? "?"} заявок
           </Chip>
         </div>
