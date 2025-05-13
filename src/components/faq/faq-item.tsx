@@ -104,7 +104,7 @@ export default function FaqItem({
       <CardHeader className="flex gap-1.5">
         <MessageCircleQuestion className="shrink-0" />
         <Tooltip closeDelay={0} content={title}>
-          <span className="line-clamp-2">{title}</span>
+          <span className="line-clamp-2 font-sans font-semibold">{title}</span>
         </Tooltip>
       </CardHeader>
       <Divider />

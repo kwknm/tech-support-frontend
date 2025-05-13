@@ -1,5 +1,5 @@
-import { Button, Divider, Tooltip } from "@heroui/react";
-import { PencilIcon, SaveIcon, SquarePenIcon, TextIcon } from "lucide-react";
+import { Divider } from "@heroui/react";
+import { PencilIcon, TextIcon } from "lucide-react";
 import {
   headingsPlugin,
   listsPlugin,
@@ -17,6 +17,7 @@ import { Axios } from "@/api/api-provider.ts";
 import InitializedMDXEditor from "@/components/common/initialized-mdxeditor.tsx";
 import { useAuthStore } from "@/hooks/use-auth-store.ts";
 import { Ticket } from "@/types";
+import EditButtonGroup from "@/components/common/edit-button-group.tsx";
 
 export default function TicketDescription({
   id,
@@ -87,37 +88,26 @@ export default function TicketDescription({
       </CardBody>
       <Divider />
       <CardFooter className="flex justify-between">
-        {isAllowedToEdit || (
-          <>
-            {editedAt && (
-              <span className="text-sm italic flex flex-row gap-1.5">
-                <PencilIcon size={20} /> Редактировано{" "}
-                {moment(editedAt).format("LLL")}
-              </span>
-            )}
-            {isAllowedToEdit &&
-              (isEditing ? (
-                <Button
-                  color="primary"
-                  isLoading={isLoading}
-                  startContent={<SaveIcon />}
-                  variant="flat"
-                  onPress={updateDescription}
-                >
-                  Сохранить
-                </Button>
-              ) : (
-                <Tooltip content="Редактировать">
-                  <Button
-                    isIconOnly
-                    color="default"
-                    startContent={<SquarePenIcon />}
-                    variant="bordered"
-                    onPress={() => setIsEditing(true)}
-                  />
-                </Tooltip>
-              ))}
-          </>
+        {isAllowedToEdit && (
+          <div>
+            <EditButtonGroup
+              isEditing={isEditing}
+              isLoading={isLoading}
+              onCancel={() => {
+                setIsEditing(false);
+              }}
+              onEdit={() => {
+                setIsEditing(true);
+              }}
+              onSave={updateDescription}
+            />
+          </div>
+        )}
+        {editedAt && (
+          <span className="text-sm italic flex flex-row gap-1.5">
+            <PencilIcon size={20} /> Редактировано{" "}
+            {moment(editedAt).format("LLL")}
+          </span>
         )}
       </CardFooter>
     </Card>

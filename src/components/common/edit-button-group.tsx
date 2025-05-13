@@ -31,12 +31,12 @@ export default function EditButtonGroup({
   }
 
   return (
-    <>
+    <div className="flex gap-1">
       <Tooltip closeDelay={0} content="Сохранить изменения">
         <Button
           isIconOnly
           color="primary"
-          isLoading={isLoading}
+          isDisabled={isLoading}
           startContent={<SaveIcon />}
           variant="flat"
           onPress={onSave}
@@ -51,6 +51,6 @@ export default function EditButtonGroup({
           onPress={onCancel}
         />
       </Tooltip>
-    </>
+    </div>
   );
 }

@@ -44,7 +44,7 @@ export const Message = ({
         <div className="grow text-end">
           <div className="inline-flex flex-col gap-2 items-end">
             <div className="inline-block leading-none bg-blue-500 dark:bg-blue-600 rounded-xl px-3 pt-2 pb-1 shadow-lg">
-              <p className="text-md text-white text-start message-content">
+              <p className="text-sm text-white text-start message-content">
                 <Linkify>{content}</Linkify>
               </p>
               <Tooltip closeDelay={0} content={formattedFull}>
@@ -81,7 +81,7 @@ export const Message = ({
           </h2>
           <div className="bg-white leading-none max-w-fit border border-gray-200 shadow dark:border-none rounded-xl px-3 pt-2 pb-1 space-y-3 dark:bg-neutral-900 dark:border-neutral-700">
             <div className="space-y-1.5">
-              <p className="text-sm text-gray-800 dark:text-white">
+              <p className="text-sm text-gray-800 dark:text-white message-content">
                 <Linkify>{content}</Linkify>
               </p>
               <Tooltip closeDelay={0} content={formattedFull}>
