@@ -2,9 +2,9 @@ import { Snippet } from "@heroui/react";
 import { Code } from "@heroui/react";
 import { button as buttonStyles } from "@heroui/theme";
 import { Link } from "react-router-dom";
+import { ClipboardListIcon } from "lucide-react";
 
 import { title, subtitle } from "@/components/primitives";
-import { ClipboardListIcon } from "lucide-react";
 
 export default function IndexPage() {
   return (
@@ -24,12 +24,14 @@ export default function IndexPage() {
 
         <div className="flex gap-3">
           <Link
-            className={buttonStyles({
-              color: "primary",
-              radius: "full",
-              variant: "shadow",
-              size: "lg",
-            })}
+            className={
+              buttonStyles({
+                color: "primary",
+                radius: "full",
+                variant: "shadow",
+                size: "lg",
+              }) + " hover:scale-110"
+            }
             to={"/tickets"}
           >
             <ClipboardListIcon />

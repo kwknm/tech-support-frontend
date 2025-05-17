@@ -89,7 +89,7 @@ export default function Notifications() {
   const getStaleNotifications = () => notifications.filter((x) => x.isRead);
 
   return (
-    <Dropdown onClose={readAllNotifications}>
+    <Dropdown shouldBlockScroll={false} onClose={readAllNotifications}>
       <DropdownTrigger>
         <Button isIconOnly variant="light">
           <Badge

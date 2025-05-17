@@ -110,7 +110,11 @@ export default function IssuesModal({ isOpen, onOpenChange }: Props) {
               Управление проблемами
             </ModalHeader>
             <ModalBody>
-              <Listbox items={mappedIssues} topContent="Список проблем:">
+              <Listbox
+                items={mappedIssues}
+                topContent="Список проблем:"
+                variant="bordered"
+              >
                 {(item: ListBoxItemProps) => (
                   <ListboxItem
                     key={item.key}

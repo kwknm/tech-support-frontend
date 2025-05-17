@@ -1,11 +1,4 @@
-import {
-  Button,
-  Divider,
-  Form,
-  Spinner,
-  Textarea,
-  Tooltip,
-} from "@heroui/react";
+import { Button, Form, Spinner, Textarea, Tooltip } from "@heroui/react";
 import { HubConnection, HubConnectionBuilder } from "@microsoft/signalr";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router";
@@ -14,14 +7,15 @@ import { Alert } from "@heroui/alert";
 import { AxiosError } from "axios";
 import { addToast } from "@heroui/toast";
 
-import { PaperClipIcon, PlaneIcon } from "@/components/icons.tsx";
-import { Message } from "@/components/message.tsx";
+import { PlaneIcon } from "@/components/icons.tsx";
 import TicketHeader from "@/components/tickets/ticket-header.tsx";
 import { Ticket, MessageType } from "@/types";
 import { Axios } from "@/api/api-provider.ts";
 import { useAuthStore } from "@/hooks/use-auth-store.ts";
 import { siteConfig } from "@/config/site.ts";
 import TabSwitch from "@/components/tickets/tab-switch.tsx";
+import MessageList from "@/components/tickets/chat/message-list.tsx";
+import UploadFileInput from "@/components/tickets/chat/upload-file-input.tsx";
 
 const scrollToChatBottom = () =>
   document.getElementById("scroll")?.scrollIntoView({
@@ -36,6 +30,7 @@ const ChatPage = () => {
   const [connection, setConnection] = useState<HubConnection | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isSendingMessage, setIsSendingMessage] = useState(false);
+  const [currentFile, setCurrentFile] = useState<File | undefined>(undefined);
 
   const { data, isLoading, error } = useSWR<Ticket>(`/api/tickets/${id}`);
 
@@ -94,6 +89,7 @@ const ChatPage = () => {
 
   const sendMessage = async (e: any) => {
     e.preventDefault();
+
     setIsSendingMessage(true);
     setErrorMessage(null);
 
@@ -108,7 +104,7 @@ const ChatPage = () => {
 
     let attachmentId = null;
 
-    if ((form.attachment as File).size != 0) {
+    if (currentFile) {
       try {
         const response = await Axios.post("/api/attachments", form, {
           headers: {
@@ -117,6 +113,7 @@ const ChatPage = () => {
         });
 
         attachmentId = response.data?.attachmentId ?? null;
+        setCurrentFile(undefined);
       } catch (err) {
         if (err instanceof AxiosError) {
           addToast({
@@ -126,9 +123,9 @@ const ChatPage = () => {
           });
         }
 
-        setIsSendingMessage(false);
-
         return;
+      } finally {
+        setIsSendingMessage(false);
       }
     }
 
@@ -177,96 +174,32 @@ const ChatPage = () => {
         }
         ticketId={data?.id!}
       />
-      <section className="flex flex-col items-center my-5">
-        <h2 className="text-light text-3xl text-gray-700 mb-4 dark:text-gray-200 decoration-dashed">
-          Обсуждение
-        </h2>
-        <Divider className="mb-2" />
-        <div className="flex flex-col items-center h-[calc(95vh/2)]">
-          {data?.isClosed && (
-            <Alert
-              className="my-3"
-              color="primary"
-              title={
-                <>
-                  Чат недоступен, так как заявка была закрыта.{<br />} Вы
-                  по-прежнему можете просматривать историю сообщений.
-                </>
-              }
-              variant="flat"
-            />
-          )}
-          {!messages?.length && !data?.isClosed && (
-            <Alert
-              isClosable
-              className="mb-1"
-              color="primary"
-              title={`Используйте этот чат для связи с ${user?.isSupport ? "пользователем" : "сотрудником поддержки"}`}
-              variant="flat"
-            />
-          )}
-          {messagesIsLoading ? (
-            <div className="h-[500px] flex justify-center items-center w-[600px]">
-              <Spinner label="Загружаем сообщения..." />
-            </div>
-          ) : (
-            <ul
-              className="space-y-2 h-[500px] overflow-y-auto w-[600px] [&::-webkit-scrollbar]:w-2
-                      [&::-webkit-scrollbar-track]:bg-gray-100
-                      [&::-webkit-scrollbar-thumb]:bg-gray-300
-                      dark:[&::-webkit-scrollbar-track]:bg-neutral-700
-                      dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500
-                       [&::-webkit-scrollbar-track]:rounded-full
-                       [&::-webkit-scrollbar-thumb]:rounded-full pr-2"
-            >
-              {messages?.map((m, idx) => (
-                <Message
-                  key={m.content + idx}
-                  attachment={m.attachment}
-                  content={m.content}
-                  firstName={m.firstName}
-                  isSupport={m.isSupport}
-                  isUsersMessage={m.userId == user?.id}
-                  lastName={m.lastName}
-                  timestamp={m.timestamp}
-                />
-              ))}
-              <div id="scroll" />
-            </ul>
-          )}
-        </div>
+      <section className="flex flex-col items-center my-1">
+        <MessageList
+          isLoading={messagesIsLoading}
+          isTicketClosed={data?.isClosed!}
+          messages={messages}
+        />
         <Form className="flex flex-row gap-1 mt-3" onSubmit={sendMessage}>
-          <Tooltip content="Добавить вложение">
-            <Button
-              isIconOnly
-              color="default"
-              isDisabled={data?.isClosed}
-              isLoading={messagesIsLoading}
-              variant="bordered"
-              onPress={() => document.getElementById("attachment")?.click()}
-            >
-              <PaperClipIcon />
-            </Button>
-          </Tooltip>
-          <input
-            className="hidden"
-            id="attachment"
-            name="attachment"
-            type="file"
+          <UploadFileInput
+            currentFile={currentFile}
+            isDisabled={data?.isClosed!}
+            isLoading={messagesIsLoading}
+            setCurrentFile={setCurrentFile}
           />
           <Textarea
             isRequired
-            className="w-[450px]"
+            className="w-[250px] md:w-[450px]"
+            description={currentFile?.name}
             errorMessage={errorMessage}
             isDisabled={data?.isClosed}
-            isInvalid={!!errorMessage}
             maxRows={3}
             minRows={1}
             name="content"
             placeholder="Сообщение"
             variant="bordered"
           />
-          <Tooltip content="Отправить сообщение">
+          <Tooltip closeDelay={0} content="Отправить сообщение">
             <Button
               isIconOnly
               color="default"

@@ -1,11 +1,9 @@
 import { Navigate } from "react-router-dom";
+import { ReactNode } from "react";
 
 import { useAuthStore } from "@/hooks/use-auth-store.ts";
 
-// @ts-ignore
-function AuthGuard(props) {
-  const { children } = props;
-
+export default function AuthGuard({ children }: { children: ReactNode }) {
   const { isLoggedIn } = useAuthStore();
 
   if (!isLoggedIn && !localStorage.getItem("token")) {
@@ -14,5 +12,3 @@ function AuthGuard(props) {
 
   return <>{children}</>;
 }
-
-export default AuthGuard;

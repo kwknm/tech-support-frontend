@@ -16,6 +16,8 @@ import TicketDetailsPage from "@/pages/tickets/details.tsx";
 import ChatPage from "@/pages/chat.tsx";
 import DefaultLayout from "@/layouts/default.tsx";
 import FaqPage from "@/pages/faq.tsx";
+import ReportsPage from "@/pages/reports.tsx";
+import SupportGuard from "@/SupportGuard.tsx";
 
 moment.locale("ru");
 
@@ -71,6 +73,14 @@ function App() {
             </AuthGuard>
           }
           path="/tickets/:id/chat"
+        />
+        <Route
+          element={
+            <SupportGuard>
+              <ReportsPage />
+            </SupportGuard>
+          }
+          path="/report"
         />
         <Route element={<FaqPage />} path="/faq" />
         <Route element={<LoginPage />} path="/login" />

@@ -7,11 +7,16 @@ import {
   NavbarMenuToggle,
   Button,
   NavbarMenu,
+  Dropdown,
+  DropdownTrigger,
+  DropdownMenu,
+  DropdownItem,
+  DropdownSection,
 } from "@heroui/react";
 import { link as linkStyles } from "@heroui/theme";
 import clsx from "clsx";
 import { User, Chip } from "@heroui/react";
-import { LogInIcon, LogOutIcon } from "lucide-react";
+import { FileChartColumnIcon, LogInIcon, LogOutIcon } from "lucide-react";
 
 import { siteConfig } from "@/config/site";
 import { ThemeSwitch } from "@/components/theme-switch";
@@ -30,22 +35,46 @@ export const Navbar = () => {
   const NavbarAuthStuff = () => {
     return isLoggedIn ? (
       <NavbarItem className="hidden md:flex items-center gap-5">
-        <User
-          avatarProps={{
-            name: `${user?.firstName[0]}${user?.lastName[0]}`,
-          }}
-          description={
-            isSupport && (
-              <span>
-                Вы вошли под аккаунтом{" "}
-                <Chip color={"success"} size={"sm"} variant={"flat"}>
-                  Поддержки
-                </Chip>
-              </span>
-            )
-          }
-          name={`${user?.firstName} ${user?.lastName}`}
-        />
+        <Dropdown placement="bottom-end" shouldBlockScroll={false}>
+          <DropdownTrigger>
+            <User
+              as="button"
+              avatarProps={{
+                name: `${user?.firstName[0]}${user?.lastName[0]}`,
+              }}
+              description={
+                isSupport && (
+                  <span>
+                    Вы вошли под аккаунтом{" "}
+                    <Chip color={"success"} size={"sm"} variant={"flat"}>
+                      Поддержки
+                    </Chip>
+                  </span>
+                )
+              }
+              name={`${user?.firstName} ${user?.lastName}`}
+            />
+          </DropdownTrigger>
+          <DropdownMenu aria-label="Profile Actions" variant="flat">
+            <DropdownSection title={`Аккаунт ${user?.email}`}>
+              <>
+                {user?.isSupport && (
+                  <DropdownItem
+                    key="report"
+                    className={clsx("text-primary")}
+                    description="Подробная статистика"
+                    href="/report"
+                    startContent={<FileChartColumnIcon size={18} />}
+                    variant="bordered"
+                  >
+                    Мой отчёт
+                  </DropdownItem>
+                )}
+              </>
+            </DropdownSection>
+          </DropdownMenu>
+        </Dropdown>
+
         <Notifications />
         <Button
           color={"warning"}
@@ -91,7 +120,7 @@ export const Navbar = () => {
               <Link
                 className={clsx(
                   linkStyles({ color: "foreground" }),
-                  "data-[active=true]:text-primary data-[active=true]:font-medium",
+                  "data-[active=true]:text-primary data-[active=true]:font-medium hover:underline underline-offset-4   hover:text-primary",
                 )}
                 color="foreground"
                 to={item.href}

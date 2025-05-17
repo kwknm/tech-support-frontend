@@ -187,6 +187,7 @@ export default function TicketDetailsPage() {
           description={data?.description!}
           editedAt={data?.editedAt}
           id={data?.id!}
+          isTicketClosed={data?.isClosed!}
           issuerId={data?.issuerId!}
           mutate={mutate}
         />
@@ -194,7 +195,7 @@ export default function TicketDetailsPage() {
           <AccordionItem
             key="1"
             startContent={<Paperclip />}
-            title="Приложения"
+            title={`Приложения`}
           >
             {data?.attachment ? (
               <AttachmentCard

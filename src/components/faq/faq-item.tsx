@@ -1,6 +1,6 @@
 import { Card, CardBody, CardFooter, CardHeader } from "@heroui/card";
 import { MessageCircleQuestion, Trash2Icon } from "lucide-react";
-import { Button, Divider, ScrollShadow, Tooltip } from "@heroui/react";
+import { Button, Divider, ScrollShadow, Tooltip, User } from "@heroui/react";
 import React, { useState } from "react";
 import {
   headingsPlugin,
@@ -33,7 +33,8 @@ export default function FaqItem({
 }: Faq & { mutate: KeyedMutator<Faq[]> }) {
   const { user, isLoggedIn } = useAuthStore();
   const [isEditing, setIsEditing] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingButtons, setIsLoadingButtons] = useState(false);
+  const [isLoadingLike, setIsLoadingLike] = useState(false);
   const ref = React.useRef<MDXEditorMethods>(null);
   const isAllowedToEdit = user?.isSupport;
 
@@ -47,6 +48,8 @@ export default function FaqItem({
       return;
     }
 
+    setIsLoadingLike(true);
+
     try {
       await Axios.post(`/api/faq/${faqId}/like/toggle`);
 
@@ -56,11 +59,13 @@ export default function FaqItem({
         title: "Произошла неизвестная ошибка. Попробуйте позже",
         color: "danger",
       });
+    } finally {
+      setIsLoadingLike(false);
     }
   };
 
   const updateDescription = async () => {
-    setIsLoading(true);
+    setIsLoadingButtons(true);
 
     try {
       await Axios.patch(`/api/faq/${id}`, {
@@ -76,7 +81,7 @@ export default function FaqItem({
         title: "Произошла неизвестная ошибка",
       });
     } finally {
-      setIsLoading(false);
+      setIsLoadingButtons(false);
       setIsEditing(false);
       await mutate(undefined, { revalidate: true });
     }
@@ -133,6 +138,7 @@ export default function FaqItem({
         <div className="flex gap-1.5">
           <Button
             color={user && likes.includes(user?.id) ? "primary" : "default"}
+            isDisabled={isLoadingLike}
             variant={user && likes.includes(user?.id) ? "shadow" : "faded"}
             onPress={async () => await toggleLike(id)}
           >
@@ -142,7 +148,7 @@ export default function FaqItem({
             <>
               <EditButtonGroup
                 isEditing={isEditing}
-                isLoading={isLoading}
+                isLoading={isLoadingButtons}
                 onCancel={() => setIsEditing(false)}
                 onEdit={() => setIsEditing(true)}
                 onSave={updateDescription}
@@ -164,21 +170,24 @@ export default function FaqItem({
           )}
         </div>
         <div className="flex flex-col">
-          <span className="text-sm text-default-900">
-            {author.firstName} {author.lastName}
-          </span>
-          <span className="text-sm text-default-500">
-            {!editedAt ? (
-              <span>Добавлено {moment(createdAt).format("lll")}</span>
-            ) : (
-              <Tooltip
-                closeDelay={0}
-                content={`Дата создания: ${moment(createdAt).format("lll")}`}
-              >
-                <span>Обновлено {moment(editedAt).format("lll")}</span>
-              </Tooltip>
-            )}
-          </span>
+          <User
+            avatarProps={{
+              name: `${author?.firstName[0]}${author?.lastName[0]}`,
+            }}
+            description={
+              !editedAt ? (
+                <span>Добавлено {moment(createdAt).format("lll")}</span>
+              ) : (
+                <Tooltip
+                  closeDelay={0}
+                  content={`Дата создания: ${moment(createdAt).format("lll")}`}
+                >
+                  <span>Обновлено {moment(editedAt).format("lll")}</span>
+                </Tooltip>
+              )
+            }
+            name={`${author.firstName} ${author.lastName}`}
+          />
         </div>
       </CardFooter>
     </Card>

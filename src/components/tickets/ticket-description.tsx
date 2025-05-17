@@ -12,6 +12,7 @@ import { addToast } from "@heroui/toast";
 import { KeyedMutator } from "swr";
 import { Card, CardBody, CardFooter, CardHeader } from "@heroui/card";
 import moment from "moment/min/moment-with-locales";
+import clsx from "clsx";
 
 import { Axios } from "@/api/api-provider.ts";
 import InitializedMDXEditor from "@/components/common/initialized-mdxeditor.tsx";
@@ -25,18 +26,21 @@ export default function TicketDescription({
   description,
   mutate,
   editedAt,
+  isTicketClosed,
 }: {
   id: number;
   issuerId: string;
   description: string;
   mutate: KeyedMutator<Ticket>;
   editedAt?: Date;
+  isTicketClosed: boolean;
 }) {
   const { user } = useAuthStore();
   const [isEditing, setIsEditing] = useState(false);
-  const isAllowedToEdit = user?.id === issuerId;
+  const isAllowedToEdit = user?.id === issuerId && !isTicketClosed;
   const [isLoading, setIsLoading] = useState(false);
   const ref = React.useRef<MDXEditorMethods>(null);
+  const showFooter = isAllowedToEdit || !!editedAt;
 
   const updateDescription = async () => {
     setIsLoading(true);
@@ -86,30 +90,34 @@ export default function TicketDescription({
           <InitializedMDXEditor editorRef={ref} markdown={description} />
         )}
       </CardBody>
-      <Divider />
-      <CardFooter className="flex justify-between">
-        {isAllowedToEdit && (
-          <div>
-            <EditButtonGroup
-              isEditing={isEditing}
-              isLoading={isLoading}
-              onCancel={() => {
-                setIsEditing(false);
-              }}
-              onEdit={() => {
-                setIsEditing(true);
-              }}
-              onSave={updateDescription}
-            />
-          </div>
-        )}
-        {editedAt && (
-          <span className="text-sm italic flex flex-row gap-1.5">
-            <PencilIcon size={20} /> Редактировано{" "}
-            {moment(editedAt).format("LLL")}
-          </span>
-        )}
-      </CardFooter>
+      {showFooter && (
+        <>
+          <Divider />
+          <CardFooter className={clsx("flex", "justify-between")}>
+            {isAllowedToEdit && (
+              <div>
+                <EditButtonGroup
+                  isEditing={isEditing}
+                  isLoading={isLoading}
+                  onCancel={() => {
+                    setIsEditing(false);
+                  }}
+                  onEdit={() => {
+                    setIsEditing(true);
+                  }}
+                  onSave={updateDescription}
+                />
+              </div>
+            )}
+            {editedAt && (
+              <span className="text-sm italic flex flex-row gap-1.5">
+                <PencilIcon size={20} /> Редактировано{" "}
+                {moment(editedAt).format("LLL")}
+              </span>
+            )}
+          </CardFooter>
+        </>
+      )}
     </Card>
   );
 }

@@ -1,4 +1,5 @@
 import { Chip } from "@heroui/react";
+import moment from "moment/min/moment-with-locales";
 
 export const convertStatusToTag = (
   status: number | undefined,
@@ -76,4 +77,21 @@ export const getStatusDict = () => {
     { key: "2", label: "Решена" },
     { key: "3", label: "Отклонена" },
   ];
+};
+
+export const convertStatusToString = (status: number) => {
+  const dict: Record<string, string> = {
+    3: "Отклонена",
+    2: "Решена",
+    1: "Обрабатывается",
+    0: "Открыта",
+  };
+
+  return dict[status];
+};
+
+export const formatShortTime = (ms: number) => {
+  const duration = moment.duration(ms, "milliseconds");
+
+  return `${Math.floor(duration.asHours())} ч. ${duration.minutes()} мин.`;
 };

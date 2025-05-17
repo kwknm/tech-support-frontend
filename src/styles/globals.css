@@ -42,3 +42,7 @@ pre {
 .message-content a {
     text-decoration: underline;
 }
+
+.manrope {
+    font-family: "Manrope", sans-serif;
+}

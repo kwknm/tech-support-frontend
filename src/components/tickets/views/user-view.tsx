@@ -15,6 +15,7 @@ import moment from "moment/min/moment-with-locales";
 import { Link } from "react-router-dom";
 import React from "react";
 import { Chip } from "@heroui/chip";
+import { ClipboardPlusIcon } from "lucide-react";
 
 import { title } from "@/components/primitives.ts";
 import { useAuthStore } from "@/hooks/use-auth-store.ts";
@@ -115,6 +116,7 @@ export default function TicketsUserView() {
         <AccordionItem
           key="1"
           aria-label="создать заявку"
+          startContent={<ClipboardPlusIcon />}
           subtitle="Пожалуйста, заполните форму, чтобы мы могли помочь вам решить вашу проблему"
           title="Создание новой заявки"
         >
@@ -123,7 +125,7 @@ export default function TicketsUserView() {
       </Accordion>
       <main>
         <Table
-          aria-label={"заявки"}
+          aria-label={"Заявки"}
           bottomContent={
             <div className="flex w-full justify-center">
               <Pagination
