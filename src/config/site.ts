@@ -3,7 +3,10 @@ export type SiteConfig = typeof siteConfig;
 export const siteConfig = {
   name: "Служба технической поддержки",
   description: "Служба технической поддержки пользователей.",
-  api_url: import.meta.env.VITE_API_URL,
+  api_url:
+    process.env.NODE_ENV === "development"
+      ? import.meta.env.VITE_DEV_API_URL
+      : import.meta.env.VITE_PROD_API_URL,
   navItems: [
     {
       label: "Заявки",

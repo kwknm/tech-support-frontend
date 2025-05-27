@@ -13,14 +13,14 @@ import {
   CodeToggle,
   ListsToggle,
 } from "@mdxeditor/editor";
-
-import { useTheme } from "@/hooks/use-theme.ts";
+import { useTheme } from "@heroui/use-theme";
 
 export default function InitializedMDXEditor({
   editorRef,
   ...props
 }: { editorRef: ForwardedRef<MDXEditorMethods> | null } & MDXEditorProps) {
-  const { isDark } = useTheme();
+  const { theme } = useTheme();
+  let isDark = theme === "dark";
 
   return (
     <MDXEditor

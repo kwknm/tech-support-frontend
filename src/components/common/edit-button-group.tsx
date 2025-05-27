@@ -18,7 +18,7 @@ export default function EditButtonGroup({
 }: Props) {
   if (!isEditing) {
     return (
-      <Tooltip content="Редактировать">
+      <Tooltip closeDelay={0} content="Редактировать">
         <Button
           isIconOnly
           color="default"

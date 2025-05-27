@@ -1,7 +1,6 @@
 import { ReactNode } from "react";
 
 type Props = {
-  icon: ReactNode;
   title: string | ReactNode;
   subtitle: string | ReactNode;
 };

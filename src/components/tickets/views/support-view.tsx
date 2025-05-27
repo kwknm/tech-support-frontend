@@ -102,7 +102,7 @@ export default function TicketsSupportView() {
         issuer: (
           <User
             avatarProps={{
-              name: `${user?.firstName[0]}${user?.lastName[0]}`,
+              name: `${ticket.issuer.firstName[0]}${ticket.issuer.lastName[0]}`,
             }}
             description={ticket.issuer.email}
             name={ticket.issuer.firstName + " " + ticket.issuer.lastName}

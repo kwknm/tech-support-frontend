@@ -15,6 +15,7 @@ import { parseDate } from "@internationalized/date";
 
 import { title } from "@/components/primitives.ts";
 import GeneralReport from "@/components/reports/general-report.tsx";
+import PersonalReport from "@/components/reports/personal-report.tsx";
 
 export default function ReportsPage() {
   const [filterRangeDate, setFilterRangeDate] = useState<{
@@ -100,7 +101,7 @@ export default function ReportsPage() {
             title={
               <div className="flex items-center space-x-2">
                 <ChartColumn size={20} />
-                <span>Новые заявки</span>
+                <span>Общее</span>
               </div>
             }
           >
@@ -122,7 +123,10 @@ export default function ReportsPage() {
             }
           >
             <TabContent>
-              <GeneralReport />
+              <PersonalReport
+                endDate={filterRangeDate?.end}
+                startDate={filterRangeDate?.start}
+              />
             </TabContent>
           </Tab>
         </Tabs>

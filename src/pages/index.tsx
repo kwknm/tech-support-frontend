@@ -5,8 +5,11 @@ import { Link } from "react-router-dom";
 import { ClipboardListIcon } from "lucide-react";
 
 import { title, subtitle } from "@/components/primitives";
+import { useAuthStore } from "@/hooks/use-auth-store.ts";
 
 export default function IndexPage() {
+  const { isSupport } = useAuthStore();
+
   return (
     <>
       <section className="flex flex-col items-center justify-center gap-4 py-8 md:py-10">
@@ -35,7 +38,7 @@ export default function IndexPage() {
             to={"/tickets"}
           >
             <ClipboardListIcon />
-            Оставить заявку
+            {isSupport ? "К заявкам" : "Оставить заявку"}
           </Link>
         </div>
 

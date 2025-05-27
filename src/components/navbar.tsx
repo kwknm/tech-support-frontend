@@ -58,6 +58,18 @@ export const Navbar = () => {
           <DropdownMenu aria-label="Profile Actions" variant="flat">
             <DropdownSection title={`Аккаунт ${user?.email}`}>
               <>
+                {!user?.isSupport && (
+                  <DropdownItem
+                    key="greeting"
+                    isReadOnly
+                    className={clsx("cursor-default")}
+                    variant="light"
+                  >
+                    Добро пожаловать
+                  </DropdownItem>
+                )}
+              </>
+              <>
                 {user?.isSupport && (
                   <DropdownItem
                     key="report"

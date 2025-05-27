@@ -78,3 +78,26 @@ export type Faq = {
   createdAt: Date;
   editedAt?: Date;
 };
+
+export type GeneralReport = {
+  ticketsCount: number;
+  completedTickets: number;
+  cancelledTickets: number;
+  inProgressTickets: number;
+  avgResponseTime: number;
+  avgResolutionTime: number;
+  newTicketsChartData: { name: string; value: number }[];
+  ticketsByStatus: { name: string; value: number }[];
+  ticketsByIssueType: { name: string; value: number }[];
+};
+
+export type PersonalReport = {
+  ticketsCount: number;
+  completedTickets: number;
+  cancelledTickets: number;
+  inProgressTickets: number;
+  avgResponseTimePersonal: number;
+  avgResolutionTimePersonal: number;
+  avgResponseTimeGeneral: number;
+  avgResolutionTimeGeneral: number;
+};

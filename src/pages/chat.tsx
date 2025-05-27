@@ -1,6 +1,6 @@
 import { Button, Form, Spinner, Textarea, Tooltip } from "@heroui/react";
 import { HubConnection, HubConnectionBuilder } from "@microsoft/signalr";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router";
 import useSWR from "swr";
 import { Alert } from "@heroui/alert";
@@ -31,6 +31,7 @@ const ChatPage = () => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isSendingMessage, setIsSendingMessage] = useState(false);
   const [currentFile, setCurrentFile] = useState<File | undefined>(undefined);
+  const formRef = useRef<HTMLFormElement>(null);
 
   const { data, isLoading, error } = useSWR<Ticket>(`/api/tickets/${id}`);
 
@@ -178,27 +179,46 @@ const ChatPage = () => {
         <MessageList
           isLoading={messagesIsLoading}
           isTicketClosed={data?.isClosed!}
+          issuer={data?.issuer!}
           messages={messages}
+          support={data?.support!}
         />
-        <Form className="flex flex-row gap-1 mt-3" onSubmit={sendMessage}>
+        <Form
+          ref={formRef}
+          className="flex flex-row gap-1 mt-3"
+          onSubmit={sendMessage}
+        >
           <UploadFileInput
             currentFile={currentFile}
             isDisabled={data?.isClosed!}
             isLoading={messagesIsLoading}
             setCurrentFile={setCurrentFile}
           />
-          <Textarea
-            isRequired
-            className="w-[250px] md:w-[450px]"
-            description={currentFile?.name}
-            errorMessage={errorMessage}
-            isDisabled={data?.isClosed}
-            maxRows={3}
-            minRows={1}
-            name="content"
-            placeholder="Сообщение"
-            variant="bordered"
-          />
+          <Tooltip
+            closeDelay={0}
+            content={"ENTER – новая строка, Ctrl + ENTER – отправить сообщение"}
+          >
+            <div>
+              <Textarea
+                isRequired
+                className="w-[250px] md:w-[450px]"
+                description={currentFile?.name}
+                errorMessage={errorMessage}
+                isDisabled={data?.isClosed}
+                maxRows={3}
+                minRows={1}
+                name="content"
+                placeholder="Сообщение"
+                variant="bordered"
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && e.ctrlKey) {
+                    e.preventDefault();
+                    formRef.current?.requestSubmit();
+                  }
+                }}
+              />
+            </div>
+          </Tooltip>
           <Tooltip closeDelay={0} content="Отправить сообщение">
             <Button
               isIconOnly

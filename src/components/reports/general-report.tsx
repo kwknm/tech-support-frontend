@@ -1,64 +1,45 @@
-import {
-  ClockIcon,
-  FileClockIcon,
-  TicketCheckIcon,
-  TicketPlusIcon,
-  TicketsIcon,
-  TicketXIcon,
-} from "lucide-react";
 import clsx from "clsx";
 import useSWRImmutable from "swr/immutable";
 import { memo } from "react";
 import { Divider, Spinner } from "@heroui/react";
 import moment from "moment/min/moment-with-locales";
 import {
+  Area,
+  AreaChart,
   Bar,
   BarChart,
   CartesianGrid,
   Cell,
+  LabelList,
   Legend,
-  Line,
-  LineChart,
   ResponsiveContainer,
   Tooltip,
   XAxis,
   YAxis,
 } from "recharts";
+import { useTheme } from "@heroui/use-theme";
 
 import StatisticItem from "@/components/reports/statistic-item.tsx";
-import { useTheme } from "@/hooks/use-theme.ts";
 import { convertStatusToString, formatShortTime } from "@/lib/utils.tsx";
+import { GeneralReport } from "@/types";
 
 type Props = {
   startDate?: Date;
   endDate?: Date;
 };
 
-type GeneralReport = {
-  ticketsCount: number;
-  completedTickets: number;
-  cancelledTickets: number;
-  inProgressTickets: number;
-  avgResponseTime: number;
-  avgResolutionTime: number;
-  newTicketsChartData: { name: string; value: number }[];
-  ticketsByStatus: { name: string; value: number }[];
-  ticketsByIssueType: { name: string; value: number }[];
-};
-
 const colors1 = ["#ae7ede", "#9353d3", "#7828c8", "#6020a0"].sort();
 const colors2 = ["#74DFA2", "#45D483", "#17C964", "#12A150"].sort();
 
 export default memo(function GeneralReport({ startDate, endDate }: Props) {
-  const { isDark } = useTheme();
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
 
   const { data, isLoading } = useSWRImmutable<GeneralReport>(
     `/api/reports/general?startDate=${startDate}&endDate=${endDate}`,
   );
 
-  console.log(data);
-
-  if (isLoading) {
+  if (isLoading || !data) {
     return (
       <div className="h-[100%] flex justify-center items-center p-5">
         <Spinner label="Загружаем данные..." />
@@ -78,36 +59,21 @@ export default memo(function GeneralReport({ startDate, endDate }: Props) {
           Статистика по новым заявкам в системе
         </p>
         <ResponsiveContainer height={300} width={"100%"}>
-          <LineChart className="manrope font-medium" data={mappedChartData}>
+          <AreaChart className="manrope font-medium" data={mappedChartData}>
             <CartesianGrid strokeDasharray="3 3" vertical={false} />
             <XAxis dataKey="date" stroke={isDark ? "#D4D4D8" : "#71717A"} />
             <YAxis stroke={isDark ? "#D4D4D8" : "#71717A"} />
             <Tooltip wrapperClassName="rounded-md dark:text-black" />
             <Legend />
-            <Line
-              activeDot={{ r: 8 }}
+            <Area
+              animationDuration={1000}
               dataKey="tickets"
-              dot={({ cx, cy, value }) => {
-                if (value < 1) return <></>;
-
-                return (
-                  <circle
-                    key={cx + cy}
-                    cx={cx}
-                    cy={cy}
-                    fill={isDark ? "black" : "white"}
-                    r={value > 0 ? 4 : 0}
-                    stroke={value > 0 ? "#006FEE" : "transparent"}
-                    strokeWidth={2}
-                  />
-                );
-              }}
+              fill="#0083ee"
               name="Заявки"
               stroke="#006FEE"
-              strokeWidth={2}
               type="monotone"
             />
-          </LineChart>
+          </AreaChart>
         </ResponsiveContainer>
       </header>
       <Divider />
@@ -122,38 +88,29 @@ export default memo(function GeneralReport({ startDate, endDate }: Props) {
           "items-center",
         )}
       >
-        <StatisticItem
-          icon={<TicketsIcon className="text-primary" size={52} />}
-          subtitle={data?.ticketsCount}
-          title={"Всего заявок"}
-        />
+        <StatisticItem subtitle={data?.ticketsCount} title={"Всего заявок"} />
 
         <StatisticItem
-          icon={<TicketCheckIcon className="text-success" size={52} />}
           subtitle={data?.completedTickets}
           title={"Закрытых заявок"}
         />
 
         <StatisticItem
-          icon={<TicketPlusIcon className="text-primary" size={52} />}
           subtitle={data?.inProgressTickets}
           title={"Заявок в обработке"}
         />
 
         <StatisticItem
-          icon={<TicketXIcon className="text-danger" size={52} />}
           subtitle={data?.cancelledTickets}
           title={"Отклоненных заявок"}
         />
 
         <StatisticItem
-          icon={<ClockIcon className="text-default-500" size={52} />}
           subtitle={formatShortTime(data?.avgResponseTime!)}
           title={"Сред. время ответа"}
         />
 
         <StatisticItem
-          icon={<FileClockIcon className="text-primary" size={52} />}
           subtitle={formatShortTime(data?.avgResolutionTime!)}
           title={"Сред. время решения заявки"}
         />
@@ -169,16 +126,7 @@ export default memo(function GeneralReport({ startDate, endDate }: Props) {
             data={data?.ticketsByStatus}
             layout="vertical"
           >
-            <CartesianGrid
-              horizontal={false}
-              strokeDasharray="3 3"
-              vertical={true}
-            />
-            <XAxis
-              stroke={isDark ? "#D4D4D8" : "#71717A"}
-              tickFormatter={(value) => value}
-              type="number"
-            />
+            <XAxis hide type="number" />
             <YAxis
               dataKey="name"
               stroke={isDark ? "#D4D4D8" : "#71717A"}
@@ -191,7 +139,7 @@ export default memo(function GeneralReport({ startDate, endDate }: Props) {
             />
             <Bar
               dataKey="value"
-              fill="#7828c8"
+              fill={colors1[0]}
               name="Заявки"
               radius={[0, 5, 5, 0]}
             >
@@ -201,6 +149,7 @@ export default memo(function GeneralReport({ startDate, endDate }: Props) {
                   fill={colors1[index % colors1.length]}
                 />
               ))}
+              <LabelList dataKey="value" position="right" />
             </Bar>
           </BarChart>
         </ResponsiveContainer>
@@ -216,16 +165,7 @@ export default memo(function GeneralReport({ startDate, endDate }: Props) {
             data={data?.ticketsByIssueType}
             layout="vertical"
           >
-            <CartesianGrid
-              horizontal={false}
-              strokeDasharray="3 3"
-              vertical={true}
-            />
-            <XAxis
-              stroke={isDark ? "#D4D4D8" : "#71717A"}
-              tickFormatter={(value) => value}
-              type="number"
-            />
+            <XAxis hide type="number" />
             <YAxis
               dataKey="name"
               stroke={isDark ? "#D4D4D8" : "#71717A"}
@@ -235,7 +175,7 @@ export default memo(function GeneralReport({ startDate, endDate }: Props) {
             <Tooltip wrapperClassName="rounded-md dark:text-black" />
             <Bar
               dataKey="value"
-              fill="#7828c8"
+              fill={colors2[0]}
               name="Заявки"
               radius={[0, 5, 5, 0]}
             >
@@ -245,6 +185,7 @@ export default memo(function GeneralReport({ startDate, endDate }: Props) {
                   fill={colors2[index % colors2.length]}
                 />
               ))}
+              <LabelList dataKey="value" position="right" />
             </Bar>
           </BarChart>
         </ResponsiveContainer>
